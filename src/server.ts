@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import apiRoutes from "./routes/api";
+import { swaggerSpec, swaggerUi } from "./config/swagger";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.get("/", (req, res) => {
     "¡Bienvenido a la API! Usa POST /FA/reserva para generar una Reserva."
   );
 });
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/FA", apiRoutes);
 

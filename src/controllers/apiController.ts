@@ -8,10 +8,15 @@ import { reserva_template } from "../utils/reserva_template";
  *   post:
  *     summary: Genera y descarga un archivo de reserva en formato .docx
  *     description: Recibe un JSON con datos y genera un documento de reserva en formato Word.
- *     security:
- *       - ApiKeyAuth: []
  *     tags:
  *       - Documentos
+ *     parameters:
+ *       - in: header
+ *         name: x-api-key
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Clave API necesaria para autenticar la solicitud
  *     requestBody:
  *       required: true
  *       content:

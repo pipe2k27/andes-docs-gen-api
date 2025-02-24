@@ -4,7 +4,7 @@ import { reserva_template } from "../utils/reserva_template";
 
 /**
  * @swagger
- * /generate-doc:
+ * /FA/reserva:
  *   post:
  *     summary: Genera y descarga un archivo de reserva en formato .docx
  *     description: Recibe un JSON con datos y genera un documento de reserva en formato Word.

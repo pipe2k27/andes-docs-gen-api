@@ -40,16 +40,15 @@ export const apiController = async (req: Request, res: Response) => {
       dniVendedor,
     };
 
-    const file = await generateAndDownloadWord(reserva_template, answers);
+    const fileBuffer = await generateAndDownloadWord(reserva_template, answers);
 
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     );
     res.setHeader("Content-Disposition", "attachment; filename=reserva.docx");
-    console.log("file", file);
 
-    res.send(file);
+    res.end(fileBuffer);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al generar el documento" });

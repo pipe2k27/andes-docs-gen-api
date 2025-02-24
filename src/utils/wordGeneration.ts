@@ -13,8 +13,6 @@ import {
 } from "docx";
 import { processAnswer, processDependencies } from "./TextProcessor";
 import { styles_fabian_achaval } from "./fabian-achaval";
-import fs from "fs";
-import path from "path";
 
 type ParagraphType = {
   id: string;
@@ -60,9 +58,6 @@ export const processVariablesToString = (text: string, answers: any) => {
   return text;
 };
 
-// esta funcion es necesaria por que cuando tenes un SameParagraph
-// tenes que volver para atras y agregarlo al elemento anterior
-// es una funcion dificil de entender, pero funciona
 export const joinSameParagraphs = (
   paragraphs: ParagraphType[]
 ): ParagraphType[] => {
@@ -326,27 +321,10 @@ const ConvertDataToWordElements = (
 
 export const generateAndDownloadWord = async (
   documentData: any,
-  answers: any,
-  fileName?: string
+  answers: any
 ) => {
   const doc = ConvertDataToWordElements(documentData, answers);
   const buffer = await Packer.toBuffer(doc);
 
-  const filePath = path.join(__dirname, "..", "temp", "reserva.docx");
-
-  // Crear la carpeta `temp` si no existe
-  if (!fs.existsSync(path.dirname(filePath))) {
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  }
-
-  fs.writeFileSync(filePath, buffer);
-
-  const blob = await Packer.toBlob(doc);
-  const file = new File([blob], "reserva.docx", {
-    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  });
-  let newDocName = "PRUEBA";
-  if (fileName) newDocName = fileName;
-
-  return file;
+  return buffer;
 };

@@ -340,7 +340,6 @@ export const generateAndDownloadWord = async (
   }
 
   fs.writeFileSync(filePath, buffer);
-  console.log(`Documento guardado en: ${filePath}`);
 
   const blob = await Packer.toBlob(doc);
   const file = new File([blob], "reserva.docx", {

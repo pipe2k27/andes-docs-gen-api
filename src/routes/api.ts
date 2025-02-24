@@ -4,6 +4,6 @@ import { apiKeyMiddleware } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("/generate", apiKeyMiddleware, apiController);
+router.post("/reserva", apiKeyMiddleware, apiController);
 
 export default router;

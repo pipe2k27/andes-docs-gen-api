@@ -14,10 +14,12 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("¡Bienvenido a la API! Usa POST /api/generate para enviar JSON.");
+  res.send(
+    "¡Bienvenido a la API! Usa POST /FA/reserva para generar una Reserva."
+  );
 });
 
-app.use("/api", apiRoutes);
+app.use("/FA", apiRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

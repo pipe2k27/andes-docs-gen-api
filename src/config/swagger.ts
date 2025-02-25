@@ -12,7 +12,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: "http://localhost:3000", // Cambia esto según el entorno
+        url: "https://fa-docs-generate-api.onrender.com",
       },
     ],
     components: {

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { generateAndDownloadWord } from "../utils/wordGeneration";
 import { reserva_template } from "../utils/reserva_template";
+import { validationResult } from "express-validator";
 
 /**
  * @swagger
@@ -84,6 +85,12 @@ import { reserva_template } from "../utils/reserva_template";
  */
 
 export const apiController = async (req: Request, res: Response) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+    return;
+  }
+
   try {
     const {
       ciudad,

@@ -140,3 +140,68 @@ export const reserva_template = {
     },
   ],
 };
+
+export const autorizacion_template = {
+  document: [
+    {
+      type: "title",
+      id: "0",
+      text: "AUTORIZACIÓN DE VENTA",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "1",
+      text: "En la {ciudad}, {fecha}",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "2",
+      text: "Por medio de la presente {nombreCliente}, DNI Nº {dniCliente}, con domicilio en la calle {domicilioCliente}, y constituyendo domicilio electrónico en los términos del art 75 del Código Civil y Comercial de la República Argentina en {emailCliente} (en adelante, la “Parte Autorizante”) AUTORIZA por la presente (con carácter de {exclusividad}) a la firma Fabián Achával Propiedades, Matrícula CUCICBA N 6576 Y CMCPSI N°6385 (en adelante, la “Parte Autorizada”), a comercializar la VENTA del departamento de su propiedad con frente a la calle {direccionInmueble}, {ciudad} (en adelante, el “Inmueble”).",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "3",
+      text: "[La operación de compraventa deberá efectuarse en la suma y condiciones siguientes:]",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "4",
+      text: "[PRIMERA: PRECIO TOTAL Y AL CONTADO:] La presente autorización es por el precio de Dólares Estadounidenses {precioInmueble}",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "5",
+      text: "[SEGUNDA: PLAZO:] Se fija como término para la presente autorización el de {tiempoAutorizacion} días corridos a partir de la fecha. El presente término se prorrogará de manera automática su vencimiento indefinidamente salvo que el suscripto comunicara fehacientemente su decisión de darla por caducada.",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "6",
+      text: "[TERCERA: HONORARIOS:] La Parte Autorizante queda comprometida a abonar a la firma Fabián Achával, en el acto de concretarse la operación, el {porcentajeHonorarios} porciento sobre el importe total de la operación, más IVA en concepto de honorarios por su intervención.",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "7",
+      text: "[CUARTA: CONDICIONES:] a) El propietario no podrá comercializar la propiedad en forma directa durante la duración de la presente autorización, sin ningún tipo de excepción; b) Si la Parte Autorizante vendiera la propiedad dentro del período de vigencia de la presente autorización, o la vendiera después del vencimiento de dicho período, a personas o entidades presentadas por Fabián Achával Propiedades, siempre y cuando el comprador se hubiera acercado por trabajo de Fabián Achával Propiedades, la Parte Autorizante abonará al Autorizado la totalidad de los honorarios pactados en la presente autorización; y c) Todo el material fotográfico y los planos son propiedad de la inmobiliaria y no podrán ser utilizados por el propietario del inmueble sin previa autorización escrita. El propietario podrá compartir links, e información de la propiedad, canalizando cualquier interesado a través de la Fabián Achával Propiedades.",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "8",
+      text: "[QUINTA: DOCUMENTACIÓN NECESARIA:] La Parte Autorizante se compromete a entregar a la Parte Autorizada la siguiente documentación: a) Fotocopia del título de propiedad; b) Fotocopia(s) del DNI de la Parte Autorizante; c) Fotocopia de los tres (3) últimos resúmenes de expensas, ABL y AYSA; d) Reglamento de Copropiedad; y e) Declaratoria de herederos, poderes, testimonios, etc, en caso de corresponder.",
+      dependencies: [],
+    },
+    {
+      type: "newParagraph",
+      id: "9",
+      text: "{nombreCliente}, DNI {dniCliente}",
+      dependencies: [],
+    },
+  ],
+};

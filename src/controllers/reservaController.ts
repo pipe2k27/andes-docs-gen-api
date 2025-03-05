@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { generateAndDownloadWord } from "../utils/wordGeneration";
-import { reserva_template } from "../utils/reserva_template";
+import { reserva_template } from "../utils/document_templates";
 import { validationResult } from "express-validator";
 
 /**
@@ -84,7 +84,7 @@ import { validationResult } from "express-validator";
  *         description: Error al generar el documento
  */
 
-export const apiController = async (req: Request, res: Response) => {
+export const reservaController = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });

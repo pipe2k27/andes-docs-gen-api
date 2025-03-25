@@ -1,3 +1,4 @@
+import NumeroALetras from "./numbersToLetters";
 import {
   processCatastro,
   processMoney,
@@ -28,12 +29,16 @@ function replaceLastCommaWithY(inputString: string): string {
 export const processAnswer = (
   answer:
     | string
+    | number
     | {
         type: string;
         [key: string]: any;
       }
 ): string => {
   if (typeof answer === "string") return answer;
+  if (typeof answer === "number") {
+    return `${NumeroALetras(answer)} ${answer}`;
+  }
   if (answer.type === "multipleOptions") {
     const processedString = Object.keys(answer)
       .filter((key) => key !== "type" && answer[key] === true)

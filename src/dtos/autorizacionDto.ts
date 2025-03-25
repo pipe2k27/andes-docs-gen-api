@@ -25,7 +25,7 @@ export const autorizacionDto = [
     .optional()
     .trim()
     .isString()
-    .withMessage("El DNI del cliente debe tener entre 7 y 8 dígitos"),
+    .withMessage("El DNI del cliente debe tener entre 7 y 8 caracteres"),
 
   body("domicilioCliente")
     .optional()
@@ -58,10 +58,8 @@ export const autorizacionDto = [
 
   body("precioInmueble")
     .optional()
-    .trim()
-    .isString()
-    .isLength({ min: 1 })
-    .withMessage("El precio del inmueble debe ser un número entero positivo"),
+    .isFloat({ min: 0 })
+    .withMessage("El precio del inmueble debe ser un número positivo"),
 
   body("tiempoAutorizacion")
     .optional()

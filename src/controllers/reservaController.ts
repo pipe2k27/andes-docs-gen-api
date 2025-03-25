@@ -68,15 +68,24 @@ import { reserva_template } from "../utils/document_templates";
  *               montoReserva:
  *                 type: number
  *                 example: 50000
- *                 description: Opcional. Si no se envía, se verá un espacio vacío.
+ *                 description: |
+ *                   Opcional. Monto de la reserva en formato numérico.
+ *                   Si se envía como número (ej: 50000), aparecerá en letras y números (ej: "CINCUENTA MIL 50000").
+ *                   Si se envía como string (ej: "50000"), aparecerá solo el número.
  *               diasValidezReserva:
- *                 type: number
- *                 example: 30
- *                 description: Opcional. Si no se envía, se verá un espacio vacío.
+ *                 type: string
+ *                 example: "30"
+ *                 description: |
+ *                   Opcional. Días de validez de la reserva.
+ *                   Se recomienda enviar como string para que aparezca solo el número.
+ *                   Si se envía como número, aparecerá en letras y números (ej: "TREINTA 30").
  *               valorInmueble:
  *                 type: number
  *                 example: 150000
- *                 description: Opcional. Si no se envía, se verá un espacio vacío.
+ *                 description: |
+ *                   Opcional. Valor del inmueble en formato numérico.
+ *                   Si se envía como número (ej: 150000), aparecerá en letras y números (ej: "CIENTO CINCUENTA MIL 150000").
+ *                   Si se envía como string (ej: "150000"), aparecerá solo el número.
  *               nombreVendedor:
  *                 type: string
  *                 example: "María González"

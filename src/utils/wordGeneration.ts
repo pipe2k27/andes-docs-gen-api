@@ -13,6 +13,7 @@ import {
 } from "docx";
 import { processAnswer, processDependencies } from "./TextProcessor";
 import { styles_fabian_achaval } from "./fabian-achaval";
+import NumeroALetras from "./numbersToLetters";
 
 type ParagraphType = {
   id: string;
@@ -41,10 +42,17 @@ export const processVariablesToString = (text: string, answers: any) => {
               return processAnswer(answers[split[0]][split[1]]);
             }
 
-            if (answers && answers[str]) {
-              if (isBold) return `[${processAnswer(answers[str])}]`;
-
-              return processAnswer(answers[str]);
+            if (answers && answers[str] !== undefined) {
+              const value = answers[str];
+              // Manejar números directamente
+              if (typeof value === "number") {
+                const inWords = NumeroALetras(value);
+                const formatted = `${inWords} ${value}`;
+                if (isBold) return `[${formatted}]`;
+                return formatted;
+              }
+              if (isBold) return `[${processAnswer(value)}]`;
+              return processAnswer(value);
             }
             return "___________________";
           } catch {

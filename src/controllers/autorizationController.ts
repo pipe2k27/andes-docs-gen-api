@@ -28,40 +28,51 @@ import { autorizacion_template } from "../utils/document_templates";
  *               ciudad:
  *                 type: string
  *                 example: "Buenos Aires"
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               fecha:
  *                 type: string
  *                 format: date
  *                 example: "2025-02-24"
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               nombreCliente:
  *                 type: string
  *                 example: "Juan Pérez"
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               dniCliente:
  *                 type: integer
  *                 example: 12345678
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               domicilioCliente:
  *                 type: string
  *                 example: "Calle Falsa 123"
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               emailCliente:
  *                 type: string
  *                 format: email
  *                 example: "juan.perez@email.com"
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               exclusividad:
  *                 type: string
  *                 enum: [exclusiva, no exclusiva]
  *                 example: "exclusiva"
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               direccionInmueble:
  *                 type: string
  *                 example: "Av. Siempre Viva 742"
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               precioInmueble:
  *                 type: integer
  *                 example: 150000
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               tiempoAutorizacion:
  *                 type: integer
  *                 example: 90
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *               porcentajeHonorarios:
  *                 type: number
  *                 format: float
  *                 example: 2.5
+ *                 description: Campo opcional, si no se envía se verá vacío.
  *     responses:
  *       200:
  *         description: Documento generado exitosamente

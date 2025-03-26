@@ -32,7 +32,7 @@ export const styles_fabian_achaval = {
           new ImageRun({
             data: fabianAchavalHeader,
             transformation: {
-              width: 180.69,
+              width: 190.69,
               height: 43,
             },
             type: "png",

@@ -1,7 +1,7 @@
 {
-  "name": "f-achaval",
+  "name": "andes-docs-gen-api",
   "version": "1.0.0",
-  "description": "Repo for Andes Docs",
+  "description": "Repository for Andes Docs Whatsapp integration",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "docx": "^9.2.0",
@@ -23,6 +25,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@types/aws-sdk": "^0.0.42",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",

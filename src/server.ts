@@ -16,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("¡Bienvenido a la API de Andes Docs! ");
+  res.send("¡Bienvenido a la API de Andes Docs!");
 });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

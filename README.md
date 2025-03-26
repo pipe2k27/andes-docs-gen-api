@@ -1,2 +1,2 @@
-# f-achaval
-Repo for Andes Docs
+# andes-docs-gen-api
+Document generator for Andes Docs

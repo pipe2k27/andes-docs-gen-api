@@ -13,12 +13,6 @@ export const reserva_questions: Question[] = [
   {
     key: "ciudad",
     question: "¿En qué ciudad se encuentra el inmueble que se está reservando?",
-    options: [
-      { value: "1", label: "CABA" },
-      { value: "2", label: "Buenos Aires" },
-      { value: "3", label: "Córdoba" },
-      { value: "4", label: "Rosario" },
-    ],
   },
   {
     key: "fecha",

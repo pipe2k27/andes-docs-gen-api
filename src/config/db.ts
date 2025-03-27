@@ -7,7 +7,7 @@ export const companies: Company[] = [
   {
     companyId: "12392",
     companyName: "FabianAchaval",
-    whatsappNumbers: ["54111522775850", "5491122775850"],
+    whatsappNumbers: ["54111522775850", "5491122775850", "5491131073107"],
     styles: styles_fabian_achaval,
     templates: {
       reserva: fa_reserva_template,

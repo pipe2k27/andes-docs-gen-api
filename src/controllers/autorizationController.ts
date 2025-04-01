@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { generateAndDownloadWord } from "../utils/wordGeneration";
 import { autorizacion_template } from "../utils/document_templates";
+import { logRequest } from "../utils/logger";
 
 /**
  * @swagger
@@ -106,6 +107,8 @@ import { autorizacion_template } from "../utils/document_templates";
  */
 
 export const autorizationController = async (req: Request, res: Response) => {
+  logRequest("/FA/autorizacion", req.ip);
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });

@@ -52,7 +52,7 @@ export const styles_fabian_achaval = {
         alignment: AlignmentType.CENTER,
         children: [
           new TextRun({
-            text: "Av. Alvear 1890, p. 12 (C1129AAN) Cdad Autónoma de Buenos Aires. Tel: +54 11 4807-2345 mail: info@fabianachaval.com",
+            text: "Av. Gral. Las Heras 1681 Piso 5G, CABA. Tel: +54 11 4807-2345 mail: info@fabianachaval.com",
             size: 15,
             font: "Arial",
           }),

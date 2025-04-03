@@ -8,6 +8,7 @@ import { generateAndDownloadWord } from "../utils/generator/wordGeneration";
 import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { getCompanyByPhone } from "../config/db";
 import { normalizeText } from "../utils/normalizeText";
+import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
 
 const conversations: Record<
   string,
@@ -160,6 +161,19 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         from,
         `✅ Tu documento de ${userConversation.documentType} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
       );
+
+      if (!userConversation.documentType) {
+        throw new Error("El tipo de documento es indefinido.");
+      }
+
+      await registerDocumentInAndesDocs(
+        from,
+        userConversation.documentType,
+        fileKey,
+        fileUrl,
+        fileBuffer
+      );
+
       delete conversations[from];
       return "Gracias, la información ha sido registrada con éxito.";
     } catch (error) {

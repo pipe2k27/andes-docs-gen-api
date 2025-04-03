@@ -5,8 +5,8 @@ import { fa_autorizacion_template } from "../utils/document_templates/fa-autoriz
 
 export const companies: Company[] = [
   {
-    companyId: "12392",
-    companyName: "Fabian Achaval",
+    companyId: "12348",
+    companyName: "Demo",
     whatsappNumbers: [
       "54111522775850",
       "5491122775850",

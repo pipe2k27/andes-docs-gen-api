@@ -11,8 +11,8 @@ export const reservaDto = [
 
   body("fecha")
     .optional()
-    .isISO8601()
-    .withMessage("La fecha debe estar en formato YYYY-MM-DD"),
+    .isString()
+    .withMessage("La fecha debe ser un string"),
 
   body("tipoInmueble")
     .optional()
@@ -81,6 +81,6 @@ export const reservaDto = [
 
   body("dniVendedor")
     .optional()
-    .isInt({ min: 1000000, max: 99999999 })
+    .isInt({ min: 1, max: 99999999 })
     .withMessage("El DNI del vendedor debe tener entre 7 y 8 dígitos"),
 ];

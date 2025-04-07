@@ -11,8 +11,10 @@ export const autorizacionDto = [
 
   body("fecha")
     .optional()
-    .isISO8601()
-    .withMessage("La fecha debe estar en formato YYYY-MM-DD"),
+    .isString()
+    .withMessage(
+      "La fecha debe ser un string. Por ejemplo: 6 de abril del 2025"
+    ),
 
   body("nombreCliente")
     .optional()

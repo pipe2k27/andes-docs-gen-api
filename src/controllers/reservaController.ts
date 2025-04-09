@@ -110,7 +110,7 @@ import { logRequest } from "../utils/logger";
  */
 
 export const reservaController = async (req: Request, res: Response) => {
-  logRequest("/FA/reserva", req.ip);
+  logRequest("/reserva", req.ip);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

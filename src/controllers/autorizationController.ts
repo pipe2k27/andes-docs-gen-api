@@ -107,7 +107,7 @@ import { logRequest } from "../utils/logger";
  */
 
 export const autorizationController = async (req: Request, res: Response) => {
-  logRequest("/FA/autorizacion", req.ip);
+  logRequest("/autorizacion", req.ip);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

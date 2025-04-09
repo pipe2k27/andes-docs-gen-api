@@ -4,6 +4,8 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import apiRoutes from "./routes/api";
 import webhookRoute from "./routes/webhookRoutes";
+import logRoutes from "./routes/logRoutes";
+
 import { swaggerSpec, swaggerUi } from "./config/swagger";
 
 dotenv.config();
@@ -22,6 +24,8 @@ app.get("/", (req, res) => {
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/FA", apiRoutes);
+
+app.use(logRoutes);
 
 app.use("/webhook", webhookRoute);
 

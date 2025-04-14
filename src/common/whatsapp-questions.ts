@@ -86,6 +86,11 @@ export const reserva_questions: Question[] = [
     question:
       "¿Cuál es el número de Documento Nacional de Identidad (DNI) del vendedor? (Sólo números)",
   },
+  {
+    key: "nombreDocumento",
+    question:
+      "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
+  },
 ];
 
 export const autorizacion_questions = [
@@ -171,5 +176,10 @@ export const autorizacion_questions = [
     key: "dniVendedor",
     question:
       "¿Cuál es el número de Documento Nacional de Identidad (DNI) del vendedor? (Escriba sólo números)",
+  },
+  {
+    key: "nombreDocumento",
+    question:
+      "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
   },
 ];

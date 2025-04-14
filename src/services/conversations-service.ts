@@ -168,12 +168,17 @@ export const handleUserResponse = async (from: string, messageText: string) => {
 
       console.log("📄 Preparando para registrar documento en Andes Docs...");
 
+      const userDocName = userConversation.data.nombreDocumento?.trim();
+      const docName =
+        userDocName || `WA-${now}-${userConversation.documentType}`;
+
       await registerDocumentInAndesDocs(
         from,
         userConversation.documentType,
         fileKey,
         fileUrl,
-        fileBuffer
+        fileBuffer,
+        docName
       );
       console.log("✅ Documento registrado exitosamente en Andes Docs");
 

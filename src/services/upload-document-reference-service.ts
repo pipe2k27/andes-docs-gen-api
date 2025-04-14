@@ -6,7 +6,8 @@ export const registerDocumentInAndesDocs = async (
   documentType: string,
   fileKey: string,
   fileUrl: string,
-  fileBuffer: Buffer
+  fileBuffer: Buffer,
+  docName: string
 ) => {
   console.log(`📩 Iniciando registro en Andes Docs para ${from}`);
 
@@ -50,6 +51,8 @@ export const registerDocumentInAndesDocs = async (
         documentType === "reserva"
           ? "Reserva de Servicio"
           : "Autorización de Venta",
+      docName,
+      fileNameNoExtension: fileName,
     };
 
     // Enviar referencia del documento a Andes Docs

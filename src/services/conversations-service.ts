@@ -166,6 +166,8 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         throw new Error("El tipo de documento es indefinido.");
       }
 
+      console.log("📄 Preparando para registrar documento en Andes Docs...");
+
       await registerDocumentInAndesDocs(
         from,
         userConversation.documentType,
@@ -173,6 +175,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         fileUrl,
         fileBuffer
       );
+      console.log("✅ Documento registrado exitosamente en Andes Docs");
 
       delete conversations[from];
       return "Gracias, la información ha sido registrada con éxito.";

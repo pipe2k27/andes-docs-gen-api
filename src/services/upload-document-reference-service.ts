@@ -8,6 +8,8 @@ export const registerDocumentInAndesDocs = async (
   fileUrl: string,
   fileBuffer: Buffer
 ) => {
+  console.log(`📩 Iniciando registro en Andes Docs para ${from}`);
+
   try {
     // Obtener la información de la empresa asociada al número de WhatsApp
     const company = getCompanyByPhone(from);
@@ -23,6 +25,8 @@ export const registerDocumentInAndesDocs = async (
     // Simulación de usuario autenticado (si se tiene info real, usarla)
     const userId = `wa|${from}`; // Se puede usar el número de teléfono como ID
     const createdBy = "Usuario WhatsApp"; // Ajustar si hay datos reales
+
+    console.log(`🏢 Empresa identificada: ${company.companyName}`);
 
     const docData = {
       companyId: company.companyId,
@@ -53,6 +57,11 @@ export const registerDocumentInAndesDocs = async (
 
     console.log("📂 Documento registrado en Andes Docs:", docData);
   } catch (error) {
-    console.error("❌ Error registrando documento en Andes Docs:", error);
+    console.error("💥 ERROR en registro Andes Docs:");
+    if (error instanceof Error) {
+      console.error("- Mensaje:", error.message);
+      console.error("- Stack:", error.stack);
+    }
+    throw error; // Propaga el error para manejarlo arriba
   }
 };

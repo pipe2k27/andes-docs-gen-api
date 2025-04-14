@@ -1,4 +1,7 @@
 import axios from "axios";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const getAuth0Token = async (): Promise<string> => {
   console.log("🔍 Obteniendo token de Auth0...");

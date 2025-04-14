@@ -1,28 +1,20 @@
 import axios from "axios";
+import { getAuth0Token } from "./auth0";
 
 export const sendDocReferenceToAndesDocs = async (docData: any) => {
   try {
+    const token = await getAuth0Token();
+
+    console.log("🔑 TOKEN:", token);
+
     const response = await axios.post(
       "https://andes-docs-develop-api.onrender.com/doc-ref/create-doc-ref",
+      docData,
       {
-        companyId: docData.companyId,
-        companyName: docData.companyName,
-        documentType: docData.documentType,
-        fileNameNoExtension: docData.fileName,
-        filePath: docData.filePath,
-        fileUrl: docData.fileUrl,
-        createdBy: docData.createdBy,
-        userId: docData.userId,
-        creatorPhotoUrl: docData.creatorPhotoUrl,
-        versionId: docData.versionId,
-        versionNumber: docData.versionNumber,
-        date: docData.date,
-        size: docData.size,
-        updateDate: docData.updateDate,
-        format: docData.format,
-        andesDockerDoc: docData.andesDockerDoc,
-        expirationDate: docData.expirationDate,
-        documentKind: docData.documentKind,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       }
     );
 

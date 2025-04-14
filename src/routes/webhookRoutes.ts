@@ -6,6 +6,7 @@ import { validatePhoneMiddleware } from "../middlewares/validatePhoneMiddleware"
 const router = Router();
 const VERIFY_TOKEN = process.env.WHATS_VERIFY_TOKEN;
 
+// Route para conectarse a la API de Whatsapp
 router.get("/", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
@@ -19,6 +20,7 @@ router.get("/", (req, res) => {
   }
 });
 
+// Route que administra los mensajes enviados a la API de Whatsapp
 router.post("/", validatePhoneMiddleware, async (req, res) => {
   console.log("📩 Mensaje recibido:", JSON.stringify(req.body, null, 2));
 

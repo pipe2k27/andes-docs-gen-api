@@ -33,7 +33,7 @@ export const registerDocumentInAndesDocs = async (
       fileUrl,
       createdBy,
       userId,
-      creatorPhotoUrl: "", // Se puede obtener si está disponible en la BD
+      creatorPhotoUrl: "", // Se puede obtener si está disponible en la DB
       versionId: `${now}`,
       versionNumber: "1", // Andes Docs usa un string aquí
       date: `${now}`, // Guardar timestamp como string

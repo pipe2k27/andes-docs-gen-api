@@ -33,7 +33,7 @@ export const registerDocumentInAndesDocs = async (
       companyId: company.companyId,
       companyName: company.companyName,
       documentType: "Word", // Andes Docs usa "Word" en vez de "docx"
-      fileName,
+      fileName: docName,
       filePath: `wa-generation/${fileKey}`,
       fileUrl,
       createdBy,

@@ -23,12 +23,6 @@ export const registerDocumentInAndesDocs = async (
     const now = Date.now();
     const fileName = fileKey.replace(".docx", "");
 
-    // Simulación de usuario autenticado (si se tiene info real, usarla)
-    const userId = `wa|${from}`; // Se puede usar el número de teléfono como ID
-    const createdBy = "Usuario WhatsApp"; // Ajustar si hay datos reales
-
-    console.log(`🏢 Empresa identificada: ${company.companyName}`);
-
     const docData = {
       companyId: company.companyId,
       companyName: company.companyName,
@@ -37,8 +31,6 @@ export const registerDocumentInAndesDocs = async (
       fileName: docName,
       filePath: `wa-generation/${fileKey}`,
       fileUrl,
-      createdBy,
-      userId,
       creatorPhotoUrl: "", // Se puede obtener si está disponible en la DB
       versionId: `${now}`,
       versionNumber: "1", // Andes Docs usa un string aquí

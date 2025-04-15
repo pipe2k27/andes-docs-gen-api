@@ -4,19 +4,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const getAuth0Token = async (): Promise<string> => {
-  console.log("🔍 Obteniendo token de Auth0...");
-  console.log("Configuración:", {
-    domain: process.env.DOMAIN,
-    clientId: process.env.CLIENT_ID?.substring(0, 5) + "...", // Muestra solo parte por seguridad
-    audience: process.env.AUDIENCE,
-  });
-
   try {
-    const auth0Url = `https://${process.env.DOMAIN}/oauth/token`;
-    console.log("🌍 URL:", auth0Url);
-
-    const response = await axios.post<{ access_token: string }>(
-      auth0Url,
+    const response = await axios.post(
+      `https://${process.env.DOMAIN}/oauth/token`,
       {
         client_id: process.env.CLIENT_ID,
         client_secret: process.env.CLIENT_SECRET,
@@ -30,20 +20,9 @@ export const getAuth0Token = async (): Promise<string> => {
       }
     );
 
-    console.log("🔑 Token recibido. Status:", response.status);
     return response.data.access_token;
   } catch (error) {
-    console.error("💥 Error obteniendo token:");
-
-    if (axios.isAxiosError(error)) {
-      console.error("Detalles Axios:", {
-        status: error.response?.status,
-        error: error.response?.data?.error,
-        description: error.response?.data?.error_description,
-        url: error.config?.url,
-      });
-    }
-
-    throw new Error("Fallo en autenticación con Auth0");
+    console.error("Error getting Auth0 token:", error);
+    throw new Error("Failed to retrieve Auth0 token");
   }
 };

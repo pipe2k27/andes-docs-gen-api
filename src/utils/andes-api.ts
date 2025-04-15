@@ -5,10 +5,8 @@ export const sendDocReferenceToAndesDocs = async (docData: any) => {
   try {
     const token = await getAuth0Token();
 
-    console.log("🔑 TOKEN:", token);
-
     const response = await axios.post(
-      "https://andes-docs-develop-api.onrender.com/doc-ref/create-doc-ref",
+      "https://andes-docs-develop-api.onrender.com/doc-ref/external-create-doc-ref",
       docData,
       {
         headers: {

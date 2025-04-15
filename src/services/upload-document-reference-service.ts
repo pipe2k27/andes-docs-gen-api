@@ -31,7 +31,6 @@ export const registerDocumentInAndesDocs = async (
       fileName: docName,
       filePath: `wa-generation/${fileKey}`,
       fileUrl,
-      creatorPhotoUrl: "", // Se puede obtener si está disponible en la DB
       versionId: `${now}`,
       versionNumber: "1", // Andes Docs usa un string aquí
       date: `${now}`, // Guardar timestamp como string

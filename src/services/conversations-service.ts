@@ -155,11 +155,11 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         company.styles
       );
       const now = Date.now();
-      const fileKey = `WA-${now}-${userConversation.documentType}.docx`;
+      const fileKey = `${userConversation.data.nombreDocumento}.docx`;
       const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
       await sendWhatsAppMessage(
         from,
-        `✅ Tu documento de ${userConversation.documentType} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
+        `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
       );
 
       if (!userConversation.documentType) {

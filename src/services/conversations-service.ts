@@ -194,8 +194,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       );
       console.log("✅ Documento registrado exitosamente en Andes Docs");
 
-      delete conversations[from];
-
       await sendWhatsAppMessage(
         from,
         "Gracias, la información ha sido registrada con éxito."

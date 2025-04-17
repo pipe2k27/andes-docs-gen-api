@@ -3,16 +3,24 @@ import {
   autorizacion_questions,
   Question,
   reserva_questions,
+  signature_questions,
 } from "../common/whatsapp-questions";
 import { generateAndDownloadWord } from "../utils/generator/wordGeneration";
 import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { getCompanyByPhone } from "../config/db";
 import { normalizeText } from "../utils/normalizeText";
 import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
+import { handleSignatureStep } from "../utils/signatureSection";
 
 const conversations: Record<
   string,
-  { step: number; data: any; documentType?: string; timeout?: NodeJS.Timeout }
+  {
+    step: number;
+    data: any;
+    documentType?: string;
+    timeout?: NodeJS.Timeout;
+    signatureStep?: number;
+  }
 > = {};
 
 const startTimeout = (from: string) => {
@@ -41,6 +49,10 @@ const startTimeout = (from: string) => {
 export const handleUserResponse = async (from: string, messageText: string) => {
   let text = messageText.trim();
   console.log(`🔍 Texto recibido: ${text}`);
+
+  if (conversations[from]?.signatureStep !== undefined) {
+    return handleSignatureStep(from, text, conversations[from]);
+  }
 
   let normalizedText = normalizeText(text);
   const validOptions = ["reserva", "autorizacion"];
@@ -183,7 +195,14 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       console.log("✅ Documento registrado exitosamente en Andes Docs");
 
       delete conversations[from];
-      return "Gracias, la información ha sido registrada con éxito.";
+
+      await sendWhatsAppMessage(
+        from,
+        "Gracias, la información ha sido registrada con éxito."
+      );
+
+      conversations[from].signatureStep = 0;
+      return signature_questions[0].question;
     } catch (error) {
       console.error("❌ Error al generar documento:", error);
       return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";

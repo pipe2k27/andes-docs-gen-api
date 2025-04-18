@@ -93,6 +93,14 @@ export const reserva_questions: Question[] = [
     question:
       "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
   },
+  {
+    key: "quiereEnviarAFirmar",
+    question: "¿Desea enviar el documento a firma electrónica?",
+    options: [
+      { value: "1", label: "Sí" },
+      { value: "2", label: "No" },
+    ],
+  },
 ];
 
 export const autorizacion_questions = [
@@ -183,43 +191,5 @@ export const autorizacion_questions = [
     key: "nombreDocumento",
     question:
       "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
-  },
-];
-
-export const signature_questions: BotQuestion[] = [
-  {
-    type: "confirm",
-    key: "sendToSign",
-    question: "¿Deseas enviar el documento a firma electrónica?",
-    options: ["Sí", "No"],
-  },
-  {
-    type: "number",
-    key: "signerCount",
-    question: "¿Cuántos firmantes tendrá el documento? (Máximo 10)",
-    validate: (input: string) => {
-      const n = parseInt(input, 10);
-      return n >= 1 && n <= 10;
-    },
-    errorMessage: "Por favor, ingresa un número entre 1 y 10.",
-  },
-  {
-    type: "dynamicGroup",
-    key: "signers",
-    question: "A continuación ingresaremos los datos de los firmantes.",
-    groupSizeKey: "signerCount",
-    fields: [
-      {
-        type: "text",
-        key: "name",
-        question: "Nombre completo del firmante:",
-      },
-      {
-        type: "email",
-        key: "email",
-        question: "Correo electrónico del firmante:",
-        errorMessage: "El correo ingresado no es válido.",
-      },
-    ],
   },
 ];

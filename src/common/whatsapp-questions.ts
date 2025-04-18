@@ -192,4 +192,12 @@ export const autorizacion_questions = [
     question:
       "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
   },
+  {
+    key: "quiereEnviarAFirmar",
+    question: "¿Desea enviar el documento a firma electrónica?",
+    options: [
+      { value: "1", label: "Sí" },
+      { value: "2", label: "No" },
+    ],
+  },
 ];

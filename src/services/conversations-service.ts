@@ -191,9 +191,12 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       const docName =
         userDocName || `WA-${now}-${userConversation.documentType}`;
 
+      const date = Date.now();
+
       await registerDocumentInAndesDocs(
         from,
         userConversation.documentType,
+        String(date),
         fileKey,
         fileUrl,
         fileBuffer,
@@ -204,6 +207,8 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       signatureConversations[from] = {
         from,
         filePath: fileKey, // o la URL si eso requiere el endpoint
+        documentId: String(date),
+        documentKind: userConversation.documentType,
         signers: [],
         step: 0,
       };

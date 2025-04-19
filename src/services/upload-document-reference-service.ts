@@ -4,6 +4,7 @@ import { sendDocReferenceToAndesDocs } from "../utils/andes-api";
 export const registerDocumentInAndesDocs = async (
   from: string,
   documentType: string,
+  documentId: string,
   fileKey: string,
   fileUrl: string,
   fileBuffer: Buffer,
@@ -43,6 +44,7 @@ export const registerDocumentInAndesDocs = async (
         documentType === "reserva" ? "Reserva" : "Autorización de Venta",
       docName,
       fileNameNoExtension: fileName,
+      documentId,
     };
 
     // Enviar referencia del documento a Andes Docs

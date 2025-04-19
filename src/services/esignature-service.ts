@@ -4,6 +4,8 @@ import { conversations } from "./conversations-service";
 type SignatureConversation = {
   from: string;
   filePath: string;
+  documentId: string;
+  documentKind: string;
   signers: Signer[];
   step: number;
   totalSigners?: number;
@@ -62,6 +64,8 @@ export const handleSignatureFlow = async (from: string, text: string) => {
     } else {
       console.log("DATA FOR ANDES DOCS ENDPOINT:", {
         phone: sigConv.from,
+        documentId: sigConv.documentId,
+        documentKind: sigConv.documentKind,
         filePath: sigConv.filePath,
         signers: sigConv.signers,
       });

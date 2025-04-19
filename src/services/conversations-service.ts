@@ -191,7 +191,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       delete conversations[from];
 
       userConversation.signatureStep = 0;
-      return "Gracias, la información ha sido registrada con éxito.\n¿Desea enviar este documento a firma electrónica?\n1. Sí\n2. No";
+      return "Gracias, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de *Andes Docs*";
     } catch (error) {
       console.error("❌ Error al generar documento:", error);
       return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";

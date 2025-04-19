@@ -22,7 +22,7 @@ export const handleSignatureFlow = async (from: string, text: string) => {
     if (text === "1") {
       delete conversations[from]; // 🔄 Solo borrar si elige sí
       sigConv.step++;
-      return "¿Cuántos firmantes serán? (máximo 10)";
+      return "¿Cuántos *firmantes* serán? (Máximo 10)";
     } else if (text === "2") {
       delete signatureConversations[from];
       return "Perfecto! el proceso ha finalizado, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de *Andes Docs* 🏔️";

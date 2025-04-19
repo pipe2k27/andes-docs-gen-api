@@ -12,16 +12,17 @@ export type Question = {
 export const reserva_questions: Question[] = [
   {
     key: "ciudad",
-    question: "¿En qué ciudad se encuentra el inmueble que se está reservando?",
+    question:
+      "¿En qué *ciudad* se encuentra el inmueble que se está reservando?",
   },
   {
     key: "fecha",
     question:
-      "¿Cuál es la fecha en la que se realiza la reserva? Ej: 25-12-2025 (Formato: DD-MM-AAAA)",
+      "¿Cuál es la *fecha* en la que se realiza la reserva? Ej: 25-12-2025 (Formato: DD-MM-AAAA)",
   },
   {
     key: "tipoInmueble",
-    question: "¿Qué tipo de inmueble se está reservando?",
+    question: "¿Qué *tipo de inmueble* se está reservando?",
     options: [
       { value: "1", label: "Departamento" },
       { value: "2", label: "Casa" },
@@ -32,22 +33,22 @@ export const reserva_questions: Question[] = [
   {
     key: "direccionInmueble",
     question:
-      "¿Cuál es la dirección exacta del inmueble que se está reservando? Por ejemplo: Sargento Díaz 301, Piso 1, Unidad Funcional B, Partido Tigre",
+      "¿Cuál es la *dirección exacta* del inmueble que se está reservando? Por ejemplo: Sargento Díaz 301, Piso 1, Unidad Funcional B, Partido Tigre",
   },
   {
     key: "localidadInmueble",
     question:
-      "¿En qué localidad o barrio se encuentra el inmueble? (Ej: Caballito)",
+      "¿En qué *localidad o barrio* se encuentra el inmueble? (Ej: Caballito)",
   },
   {
     key: "nombreReservante",
     question:
-      "¿Cuál es el nombre completo de la persona que realiza la reserva?",
+      "¿Cuál es el *nombre completo* de la persona que realiza la reserva?",
   },
   {
     key: "dniReservante",
     question:
-      "¿Cuál es el número de Documento Nacional de Identidad (DNI) del reservante? (Número sin puntos)",
+      "¿Cuál es el número de Documento Nacional de Identidad (*DNI*) del reservante? (Número sin puntos)",
   },
   {
     key: "cuitReservante",
@@ -65,26 +66,27 @@ export const reserva_questions: Question[] = [
   {
     key: "montoReserva",
     question:
-      "¿Cuál es el monto en *dólares* que se ha pagado como reserva? (Escriba sólo números)",
+      "¿Cuál es el *monto* en *dólares* que se ha pagado como reserva? (Escriba sólo números)",
   },
   {
     key: "diasValidezReserva",
-    question: "¿Por cuántos días es válida la reserva? (Escriba sólo números)",
+    question:
+      "¿Por cuántos *días* es válida la reserva? (Escriba sólo números)",
   },
   {
     key: "valorInmueble",
     question:
-      "¿Cuál es el valor total del inmueble en *dólares*? (Escriba sólo números)",
+      "¿Cuál es el *precio* total del inmueble en *dólares*? (Escriba sólo números)",
   },
   {
     key: "nombreVendedor",
     question:
-      "¿Cuál es el nombre completo del vendedor o representante legal del inmueble?",
+      "¿Cuál es el *nombre completo* del vendedor o representante legal del inmueble?",
   },
   {
     key: "dniVendedor",
     question:
-      "¿Cuál es el número de Documento Nacional de Identidad (DNI) del vendedor? (Sólo números)",
+      "¿Cuál es el número de Documento Nacional de Identidad (*DNI*) del vendedor? (Sólo números)",
   },
   {
     key: "nombreDocumento",
@@ -97,7 +99,7 @@ export const autorizacion_questions = [
   {
     key: "ciudad",
     question:
-      "¿En qué ciudad se encuentra el inmueble que se está autorizando?",
+      "¿En qué *ciudad* se encuentra el inmueble que se está autorizando?",
     options: [
       { value: "1", label: "CABA" },
       { value: "2", label: "Buenos Aires" },
@@ -108,12 +110,12 @@ export const autorizacion_questions = [
   {
     key: "fecha",
     question:
-      "¿Cuál es la fecha en la que se realiza la autorización? (Formato: AAAA-MM-DD)",
+      "¿Cuál es la *fecha* en la que se realiza la autorización? (Formato: AAAA-MM-DD)",
   },
   {
     key: "tipoInmueble",
     question:
-      "¿Qué tipo de inmueble se está autorizando? (Ej: Departamento, Casa, etc.)",
+      "¿Qué *tipo* de inmueble se está autorizando? (Ej: Departamento, Casa, etc.)",
     options: [
       { value: "1", label: "Departamento" },
       { value: "2", label: "Casa" },
@@ -124,58 +126,58 @@ export const autorizacion_questions = [
   {
     key: "direccionInmueble",
     question:
-      "¿Cuál es la dirección exacta del inmueble que se está autorizando?",
+      "¿Cuál es la *dirección exacta* del inmueble que se está autorizando?",
   },
   {
     key: "localidadInmueble",
-    question: "¿En qué localidad o barrio se encuentra el inmueble?",
+    question: "¿En qué *localidad o barrio* se encuentra el inmueble?",
   },
   {
     key: "nombreAutorizante",
     question:
-      "¿Cuál es el nombre completo de la persona que realiza la autorización?",
+      "¿Cuál es el *nombre completo* de la persona que realiza la autorización?",
   },
   {
     key: "dniAutorizante",
     question:
-      "¿Cuál es el número de Documento Nacional de Identidad (DNI) del autorizante? (Número sin puntos)",
+      "¿Cuál es el número de Documento Nacional de Identidad (*DNI*) del autorizante? (Número sin puntos)",
   },
   {
     key: "cuitAutorizante",
     question:
-      "¿Cuál es el CUIT (Clave Única de Identificación Tributaria) del autorizante? (Número sin puntos)",
+      "¿Cuál es el *CUIT* (Clave Única de Identificación Tributaria) del autorizante? (Número sin puntos)",
   },
   {
     key: "direccionAutorizante",
-    question: "¿Cuál es la dirección particular del autorizante?",
+    question: "¿Cuál es la *dirección particular* del autorizante?",
   },
   {
     key: "emailAutorizante",
-    question: "¿Cuál es el correo electrónico del autorizante?",
+    question: "¿Cuál es el *correo electrónico* del autorizante?",
   },
   {
     key: "montoAutorizacion",
     question:
-      "¿Cuál es el monto que se ha pagado como autorización? (Escriba sólo números)",
+      "¿Cuál es el *monto* que se ha pagado como autorización? (Escriba sólo números)",
   },
   {
     key: "diasValidezAutorizacion",
     question:
-      "¿Por cuántos días es válida la autorización? (Escriba sólo números)",
+      "¿Por *cuántos días* es válida la autorización? (Escriba sólo números)",
   },
   {
     key: "valorInmueble",
-    question: "¿Cuál es el valor total del inmueble? (Escriba sólo números)",
+    question: "¿Cuál es el *precio* total del inmueble? (Escriba sólo números)",
   },
   {
     key: "nombreVendedor",
     question:
-      "¿Cuál es el nombre completo del vendedor o representante legal del inmueble?",
+      "¿Cuál es el *nombre completo* del vendedor o representante legal del inmueble?",
   },
   {
     key: "dniVendedor",
     question:
-      "¿Cuál es el número de Documento Nacional de Identidad (DNI) del vendedor? (Escriba sólo números)",
+      "¿Cuál es el número de Documento Nacional de Identidad (*DNI*) del vendedor? (Escriba sólo números)",
   },
   {
     key: "nombreDocumento",
@@ -183,17 +185,3 @@ export const autorizacion_questions = [
       "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
   },
 ];
-
-export const signature_start_question: Question = {
-  key: "sendToSign",
-  question: "¿Desea enviar a firmar el documento generado?",
-  options: [
-    { value: "1", label: "Sí" },
-    { value: "2", label: "No" },
-  ],
-};
-
-export const signature_how_many_question: Question = {
-  key: "howMany",
-  question: "¿Cuántos firmantes serán? (máximo 10)",
-};

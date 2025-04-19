@@ -172,12 +172,12 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
       await sendWhatsAppMessage(
         from,
-        `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
+        `✅ Tu documento *${userConversation.data.nombreDocumento}* ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
       );
 
       await sendWhatsAppMessage(
         from,
-        "¿Desea enviar a firmar el documento generado?"
+        "¿Desea enviar a *firmar* el documento generado?"
       );
       await sendWhatsAppMessage(from, "1. Sí\n2. No");
 

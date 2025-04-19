@@ -158,13 +158,8 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       userConversation.data.nombreDocumento
     );
 
-    await sendWhatsAppMessage(
-      from,
-      `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
-    );
-
     delete conversations[from];
-    return;
+    return `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`;
   } catch (error) {
     console.error("❌ Error al generar documento:", error);
     return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";

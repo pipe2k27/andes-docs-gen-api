@@ -21,7 +21,6 @@ export const conversations: Record<
     data: any;
     documentType?: string;
     timeout?: NodeJS.Timeout;
-    signatureStep?: number;
   }
 > = {};
 
@@ -49,8 +48,7 @@ const startTimeout = (from: string) => {
 };
 
 export const handleUserResponse = async (from: string, messageText: string) => {
-  // 👉 Si el usuario está en el flujo de firma electrónica, delegar el mensaje
-  if (conversations[from]?.signatureStep !== undefined) {
+  if (signatureConversations[from]) {
     return await handleSignatureFlow(from, messageText);
   }
 
@@ -183,7 +181,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       );
       await sendWhatsAppMessage(from, "1. Sí\n2. No");
 
-      conversations[from].signatureStep = 0; // ← Muy importante
+      delete conversations[from];
 
       if (!userConversation.documentType) {
         throw new Error("El tipo de documento es indefinido.");
@@ -211,8 +209,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         signers: [],
         step: 0,
       };
-
-      conversations[from].signatureStep = 0;
 
       return;
     } catch (error) {

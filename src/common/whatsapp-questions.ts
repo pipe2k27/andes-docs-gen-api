@@ -183,3 +183,17 @@ export const autorizacion_questions = [
       "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
   },
 ];
+
+export const signature_start_question: Question = {
+  key: "sendToSign",
+  question: "¿Desea enviar a firmar el documento generado?",
+  options: [
+    { value: "1", label: "Sí" },
+    { value: "2", label: "No" },
+  ],
+};
+
+export const signature_how_many_question = {
+  key: "howMany",
+  question: "¿Cuántos firmantes serán? (máximo 10)",
+};

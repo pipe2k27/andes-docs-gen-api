@@ -1,17 +1,15 @@
 import axios from "axios";
 import { getAuth0Token } from "./auth0";
 
-interface Signer {
+export interface Signer {
   name: string;
   email: string;
 }
 
 export type SignatureRequest = {
-  documentUrl: string;
-  firmantes: {
-    name: string;
-    email: string;
-  }[];
+  phone: string;
+  filePath: string;
+  signers: Signer[];
 };
 
 export const sendDocReferenceToAndesDocs = async (docData: any) => {
@@ -35,7 +33,9 @@ export const sendDocReferenceToAndesDocs = async (docData: any) => {
   }
 };
 
-export const signatureDocument = async (payload: SignatureRequest) => {
+export const sendToSignDocumentWithAndesDocs = async (
+  payload: SignatureRequest
+) => {
   try {
     const token = await getAuth0Token();
 

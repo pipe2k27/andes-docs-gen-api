@@ -9,8 +9,12 @@ import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { getCompanyByPhone } from "../config/db";
 import { normalizeText } from "../utils/normalizeText";
 import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
+import {
+  handleSignatureFlow,
+  signatureConversations,
+} from "./esignature-service";
 
-const conversations: Record<
+export const conversations: Record<
   string,
   {
     step: number;
@@ -72,7 +76,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
     // Enviar mensaje de bienvenida solo si no hay una conversación activa
     await sendWhatsAppMessage(
       from,
-      "*¡Hola! Gracias por trabajar con Andes Docs⚡!* ¿Qué documento necesita generar hoy?"
+      "*¡Hola! Gracias por trabajar con Andes Docs🏔️⚡!* ¿Qué documento necesita generar hoy?"
     );
     await sendWhatsAppMessage(
       from,
@@ -188,12 +192,21 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       );
       console.log("✅ Documento registrado exitosamente en Andes Docs");
 
-      console.log("STEP:", currentStep);
-
-      delete conversations[from];
-
-      userConversation.signatureStep = 0;
-      return "Gracias, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de *Andes Docs*";
+      await sendWhatsAppMessage(
+        from,
+        "¿Desea enviar a firmar el documento generado?"
+      );
+      signatureConversations[from] = {
+        from,
+        filePath: fileKey, // o la URL si eso requiere el endpoint
+        signers: [],
+        step: 0,
+      };
+      const signatureReply = await handleSignatureFlow(from, text);
+      if (signatureReply) {
+        return signatureReply;
+      }
+      return "1. Sí\n2. No\n\n0. Para reiniciar el proceso.";
     } catch (error) {
       console.error("❌ Error al generar documento:", error);
       return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";

@@ -38,8 +38,10 @@ router.post("/", validatePhoneMiddleware, async (req, res) => {
       // Manejar respuesta del usuario y obtener la siguiente pregunta
       const replyMessage = await handleUserResponse(from, text);
 
-      // Enviar la siguiente pregunta
-      await sendWhatsAppMessage(from, replyMessage);
+      // Solo enviar el mensaje si existe uno
+      if (replyMessage) {
+        await sendWhatsAppMessage(from, replyMessage);
+      }
 
       res.sendStatus(200);
     } else {

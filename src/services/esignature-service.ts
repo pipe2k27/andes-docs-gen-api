@@ -13,16 +13,14 @@ type SignatureConversation = {
 export const signatureConversations: Record<string, SignatureConversation> = {};
 
 export const handleSignatureFlow = async (from: string, text: string) => {
-  // Finaliza la conversación anterior (de generación de documento)
-  delete conversations[from];
-
-  // Aquí sigue la lógica del flujo de firma electrónica...
-
   const sigConv = signatureConversations[from];
+
+  // Si aún no existe, espera a que se cree en handleUserResponse
   if (!sigConv) return null;
 
   if (sigConv.step === 0) {
     if (text === "1") {
+      delete conversations[from]; // 🔄 Solo borrar si elige sí
       sigConv.step++;
       return "¿Cuántos firmantes serán? (máximo 10)";
     } else if (text === "2") {
@@ -62,7 +60,6 @@ export const handleSignatureFlow = async (from: string, text: string) => {
         sigConv.currentSignerIndex! + 1
       }:`;
     } else {
-      // Aquí llamarías a sendToSignDocumentWithAndesDocs
       console.log("DATA FOR ANDES DOCS ENDPOINT:", {
         phone: sigConv.from,
         filePath: sigConv.filePath,
@@ -74,6 +71,7 @@ export const handleSignatureFlow = async (from: string, text: string) => {
       //     filePath: sigConv.filePath,
       //     signers: sigConv.signers,
       //   });
+
       delete signatureConversations[from];
       return "✅ El documento ha sido enviado para firma electrónica.";
     }

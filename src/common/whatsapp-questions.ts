@@ -193,7 +193,7 @@ export const signature_start_question: Question = {
   ],
 };
 
-export const signature_how_many_question = {
+export const signature_how_many_question: Question = {
   key: "howMany",
   question: "¿Cuántos firmantes serán? (máximo 10)",
 };

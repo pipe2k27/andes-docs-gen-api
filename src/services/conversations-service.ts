@@ -49,6 +49,10 @@ const startTimeout = (from: string) => {
 };
 
 export const handleUserResponse = async (from: string, messageText: string) => {
+  // 👉 Si el usuario está en el flujo de firma electrónica, delegar el mensaje
+  if (conversations[from]?.signatureStep !== undefined) {
+    return await handleSignatureFlow(from, messageText);
+  }
   let text = messageText.trim();
   console.log(`🔍 Texto recibido: ${text}`);
 
@@ -172,6 +176,14 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
       );
 
+      await sendWhatsAppMessage(
+        from,
+        "¿Desea enviar a firmar el documento generado?"
+      );
+      await sendWhatsAppMessage(from, "1. Sí\n2. No");
+
+      conversations[from].signatureStep = 0; // ← Muy importante
+
       if (!userConversation.documentType) {
         throw new Error("El tipo de documento es indefinido.");
       }
@@ -192,21 +204,14 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       );
       console.log("✅ Documento registrado exitosamente en Andes Docs");
 
-      await sendWhatsAppMessage(
-        from,
-        "¿Desea enviar a firmar el documento generado?"
-      );
       signatureConversations[from] = {
         from,
         filePath: fileKey, // o la URL si eso requiere el endpoint
         signers: [],
         step: 0,
       };
-      const signatureReply = await handleSignatureFlow(from, text);
-      if (signatureReply) {
-        return signatureReply;
-      }
-      return "1. Sí\n2. No\n\n0. Para reiniciar el proceso.";
+
+      return;
     } catch (error) {
       console.error("❌ Error al generar documento:", error);
       return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";

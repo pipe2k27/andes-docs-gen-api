@@ -1,3 +1,4 @@
+import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { sendToSignDocumentWithAndesDocs, Signer } from "../utils/andes-api";
 import { conversations } from "./conversations-service";
 
@@ -26,8 +27,14 @@ export const handleSignatureFlow = async (from: string, text: string) => {
       sigConv.step++;
       return "¿Cuántos *firmantes* serán? (Máximo 10)";
     } else if (text === "2") {
+      await sendWhatsAppMessage(
+        from,
+        "Perfecto! el proceso ha finalizado, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de Andes Docs 🏔️"
+      );
+      // 🔧 Limpiar los estados
       delete signatureConversations[from];
-      return "Perfecto! el proceso ha finalizado, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de *Andes Docs* 🏔️";
+      delete conversations[from];
+      return;
     } else {
       return "Opción no válida. Por favor, responde 1 para Sí o 2 para No.";
     }

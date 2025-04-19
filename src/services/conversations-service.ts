@@ -53,6 +53,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
   if (conversations[from]?.signatureStep !== undefined) {
     return await handleSignatureFlow(from, messageText);
   }
+
   let text = messageText.trim();
   console.log(`🔍 Texto recibido: ${text}`);
 
@@ -210,6 +211,8 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         signers: [],
         step: 0,
       };
+
+      conversations[from].signatureStep = 0;
 
       return;
     } catch (error) {

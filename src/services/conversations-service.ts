@@ -3,7 +3,6 @@ import { s3StoreFile } from "../utils/s3Uploader";
 import {
   autorizacion_questions,
   reserva_questions,
-  signature_questions,
   Question,
 } from "../common/whatsapp-questions";
 import { generateAndDownloadWord } from "../utils/generator/wordGeneration";
@@ -11,7 +10,6 @@ import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { getCompanyByPhone } from "../config/db";
 import { normalizeText } from "../utils/normalizeText";
 import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
-import { handleSignatureQuestionsStep } from "../utils/signature_section";
 
 export type Conversations = typeof conversations;
 
@@ -22,12 +20,6 @@ const conversations: Record<
     data: any;
     documentType?: string;
     timeout?: NodeJS.Timeout;
-    signatureStep?: number;
-    signatureStepIndex?: number;
-    documentUrl?: string;
-    firmantes?: { name: string; email: string }[];
-    currentFirmante?: number;
-    expecting?: "nombre" | "email";
   }
 > = {};
 
@@ -66,28 +58,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
   const userConversation = conversations[from];
 
   if (
-    userConversation?.step === undefined &&
-    userConversation?.signatureStep === 0
-  ) {
-    if (text === "1") {
-      conversations[from] = {
-        ...userConversation,
-        signatureStep: 1,
-        signatureStepIndex: 0,
-        documentUrl: await s3StoreFile(
-          "wa-generation",
-          `${userConversation.data.nombreDocumento}.docx`,
-          Buffer.from("")
-        ),
-      };
-      return optionsForSignatureSection(signature_questions[0]);
-    } else {
-      delete conversations[from];
-      return "Perfecto. El proceso ha finalizado ✅";
-    }
-  }
-
-  if (
     !userConversation &&
     !validOptions.includes(normalizedText) &&
     text !== "1" &&
@@ -96,10 +66,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
     await sendWhatsAppMessage(
       from,
       "*¡Hola! Gracias por trabajar con Andes Docs⚡!* ¿Qué documento necesita generar hoy?"
-    );
-    await sendWhatsAppMessage(
-      from,
-      "*Elegí una de las siguientes opciones para comenzar"
     );
     return "1. Reserva\n2. Autorización\n\n0. Para reiniciar el proceso";
   }
@@ -114,18 +80,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
     return formatQuestionWithOptions(
       text === "1" ? reserva_questions[0] : autorizacion_questions[0]
     );
-  }
-
-  if (
-    userConversation.signatureStep !== undefined &&
-    userConversation.signatureStep >= 1
-  ) {
-    const response = await handleSignatureQuestionsStep(
-      from,
-      text,
-      conversations
-    );
-    return response;
   }
 
   const currentStep = userConversation.step;
@@ -204,9 +158,13 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       userConversation.data.nombreDocumento
     );
 
-    userConversation.signatureStep = 0;
-    userConversation.signatureStepIndex = 0;
-    return "¿Desea enviar este documento a firma electrónica?\n1. Sí\n2. No";
+    await sendWhatsAppMessage(
+      from,
+      `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
+    );
+
+    delete conversations[from];
+    return;
   } catch (error) {
     console.error("❌ Error al generar documento:", error);
     return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";
@@ -223,11 +181,4 @@ const formatQuestionWithOptions = (question: Question) => {
   return `${question.question}${
     optionsText ? "\n" + optionsText : ""
   }${additionalOptions}`;
-};
-
-const optionsForSignatureSection = (question: Question) => {
-  const optionsText =
-    question.options?.map((opt) => `${opt.value}. ${opt.label}`).join("\n") ||
-    "";
-  return `${question.question}${optionsText ? "\n" + optionsText : ""}`;
 };

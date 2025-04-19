@@ -11,6 +11,22 @@ export type Question = {
   options?: Option[];
 };
 
+export const signature_questions: Question[] = [
+  {
+    key: "signerCount",
+    question: "¿Cuántos firmantes tendrá el documento? (Máximo 10)",
+  },
+  {
+    key: "signerName",
+    question: "Por favor, indícame el *nombre completo* del firmante número 1:",
+  },
+  {
+    key: "signerEmail",
+    question: "Ahora dime el *correo electrónico* de ese firmante:",
+  },
+  // Luego se repetirán las dos preguntas anteriores según la cantidad de firmantes
+];
+
 export const reserva_questions: Question[] = [
   {
     key: "ciudad",

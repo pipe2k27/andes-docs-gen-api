@@ -6,12 +6,13 @@ interface Signer {
   email: string;
 }
 
-interface SignatureRequest {
-  phoneNumber: string;
-  documentName: string;
+export type SignatureRequest = {
   documentUrl: string;
-  signers: Signer[];
-}
+  firmantes: {
+    name: string;
+    email: string;
+  }[];
+};
 
 export const sendDocReferenceToAndesDocs = async (docData: any) => {
   try {

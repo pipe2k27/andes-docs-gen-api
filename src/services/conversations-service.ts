@@ -188,6 +188,8 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       );
       console.log("✅ Documento registrado exitosamente en Andes Docs");
 
+      console.log("STEP:", currentStep);
+
       delete conversations[from];
 
       userConversation.signatureStep = 0;

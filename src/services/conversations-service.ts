@@ -80,7 +80,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
           Buffer.from("")
         ),
       };
-      return formatQuestionWithOptions(signature_questions[0]);
+      return optionsForSignatureSection(signature_questions[0]);
     } else {
       delete conversations[from];
       return "Perfecto. El proceso ha finalizado ✅";
@@ -96,6 +96,10 @@ export const handleUserResponse = async (from: string, messageText: string) => {
     await sendWhatsAppMessage(
       from,
       "*¡Hola! Gracias por trabajar con Andes Docs⚡!* ¿Qué documento necesita generar hoy?"
+    );
+    await sendWhatsAppMessage(
+      from,
+      "*Elegí una de las siguientes opciones para comenzar"
     );
     return "1. Reserva\n2. Autorización\n\n0. Para reiniciar el proceso";
   }
@@ -219,4 +223,11 @@ const formatQuestionWithOptions = (question: Question) => {
   return `${question.question}${
     optionsText ? "\n" + optionsText : ""
   }${additionalOptions}`;
+};
+
+const optionsForSignatureSection = (question: Question) => {
+  const optionsText =
+    question.options?.map((opt) => `${opt.value}. ${opt.label}`).join("\n") ||
+    "";
+  return `${question.question}${optionsText ? "\n" + optionsText : ""}`;
 };

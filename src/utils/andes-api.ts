@@ -8,6 +8,8 @@ export interface Signer {
 
 export type SignatureRequest = {
   phone: string;
+  documentId: string;
+  documentKind: string;
   filePath: string;
   signers: Signer[];
 };

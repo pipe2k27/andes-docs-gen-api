@@ -77,11 +77,13 @@ export const handleSignatureFlow = async (from: string, text: string) => {
         signers: sigConv.signers,
       });
 
-      //   await sendToSignDocumentWithAndesDocs({
-      //     phone: sigConv.from,
-      //     filePath: sigConv.filePath,
-      //     signers: sigConv.signers,
-      //   });
+      await sendToSignDocumentWithAndesDocs({
+        phone: sigConv.from,
+        documentId: sigConv.documentId,
+        documentKind: sigConv.documentKind,
+        filePath: sigConv.filePath,
+        signers: sigConv.signers,
+      });
 
       delete signatureConversations[from];
       return "✅ El documento ha sido enviado para firma electrónica.";

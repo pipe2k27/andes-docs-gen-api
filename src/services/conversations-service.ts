@@ -181,8 +181,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       );
       await sendWhatsAppMessage(from, "1. Sí\n2. No");
 
-      delete conversations[from];
-
       if (!userConversation.documentType) {
         throw new Error("El tipo de documento es indefinido.");
       }

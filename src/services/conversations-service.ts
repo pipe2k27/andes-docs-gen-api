@@ -67,6 +67,10 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       from,
       "*¡Hola! Gracias por trabajar con Andes Docs⚡!* ¿Qué documento necesita generar hoy?"
     );
+    await sendWhatsAppMessage(
+      from,
+      "*Elegí una de las siguientes opciones para comenzar* "
+    );
     return "1. Reserva\n2. Autorización\n\n0. Para reiniciar el proceso";
   }
 
@@ -142,16 +146,9 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
     );
 
-    const type = userConversation.data.documentType;
-
-    if (!type || typeof type !== "string") {
-      delete conversations[from];
-      return "No se pudo encontrar el nombre del documento. Por favor, comenzá de nuevo.";
-    }
-
     await registerDocumentInAndesDocs(
       from,
-      type,
+      userConversation.data.documentType,
       fileKey,
       fileUrl,
       fileBuffer,

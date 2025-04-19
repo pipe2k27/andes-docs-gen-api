@@ -1,17 +1,14 @@
-// main conversation service
 import { s3StoreFile } from "../utils/s3Uploader";
 import {
   autorizacion_questions,
-  reserva_questions,
   Question,
+  reserva_questions,
 } from "../common/whatsapp-questions";
 import { generateAndDownloadWord } from "../utils/generator/wordGeneration";
 import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { getCompanyByPhone } from "../config/db";
 import { normalizeText } from "../utils/normalizeText";
 import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
-
-export type Conversations = typeof conversations;
 
 const conversations: Record<
   string,
@@ -20,6 +17,7 @@ const conversations: Record<
     data: any;
     documentType?: string;
     timeout?: NodeJS.Timeout;
+    signatureStep?: number;
   }
 > = {};
 
@@ -27,9 +25,12 @@ const startTimeout = (from: string) => {
   if (!conversations[from]) return;
 
   conversations[from].timeout = setTimeout(async () => {
-    console.log(`⌛ Usuario ${from} no ha respondido en 2 minutos.`);
+    console.log(
+      `⌛ Usuario ${from} no ha respondido en 2 minuto. Enviando recordatorio...`
+    );
     await sendWhatsAppMessage(from, "¿Estás ahí todavía?");
 
+    // Segundo timeout: Si el usuario sigue sin responder en otros 2 minutos, finalizar conversación
     conversations[from].timeout = setTimeout(async () => {
       console.log(
         `🚫 Usuario ${from} no respondió en 4 minutos. Terminando conversación.`
@@ -38,54 +39,64 @@ const startTimeout = (from: string) => {
         from,
         "Hemos finalizado la conversación. Para comenzar de nuevo, escribe 'Reserva' o 'Autorización'."
       );
-      delete conversations[from];
-    }, 120000);
-  }, 120000);
+      delete conversations[from]; // Finalizar conversación
+    }, 120000); // Esperar otros 2 minutos
+  }, 120000); // Esperar 2 minutos antes de preguntar si sigue ahí
 };
 
 export const handleUserResponse = async (from: string, messageText: string) => {
   let text = messageText.trim();
-  const normalizedText = normalizeText(text);
+  console.log(`🔍 Texto recibido: ${text}`);
+
+  let normalizedText = normalizeText(text);
   const validOptions = ["reserva", "autorizacion"];
 
-  if (text === "0") {
+  // Reiniciar el proceso si el usuario envía "0"
+  if (String(text) === "0") {
     delete conversations[from];
     await sendWhatsAppMessage(from, "Reiniciaste el proceso.");
-    await sendWhatsAppMessage(from, "¿Qué documento necesitas generar hoy?");
-    return "1. Reserva\n2. Autorización";
+    await sendWhatsAppMessage(
+      from,
+      "Por favor, sigue las instrucciones para continuar."
+    );
+    return "🔄 Has reiniciado el proceso. ¿Qué documento necesita generar hoy?\n 1. Reserva\n 2. Autorización";
   }
 
-  const userConversation = conversations[from];
-
+  // Si no hay una conversación activa y el mensaje no es una opción válida
   if (
-    !userConversation &&
+    !conversations[from] &&
     !validOptions.includes(normalizedText) &&
     text !== "1" &&
     text !== "2"
   ) {
+    // Enviar mensaje de bienvenida solo si no hay una conversación activa
     await sendWhatsAppMessage(
       from,
       "*¡Hola! Gracias por trabajar con Andes Docs⚡!* ¿Qué documento necesita generar hoy?"
     );
     await sendWhatsAppMessage(
       from,
-      "*Elegí una de las siguientes opciones para comenzar* "
+      "Por favor, elegí una opción para continuar."
     );
     return "1. Reserva\n2. Autorización\n\n0. Para reiniciar el proceso";
   }
 
-  if (!userConversation && (text === "1" || text === "2")) {
-    conversations[from] = {
-      step: 0,
-      data: {},
-      documentType: text === "1" ? "reserva" : "autorizacion",
-    };
-    startTimeout(from);
-    return formatQuestionWithOptions(
-      text === "1" ? reserva_questions[0] : autorizacion_questions[0]
-    );
+  // Si no hay una conversación activa y el usuario elige una opción (1 o 2)
+  if (!conversations[from] && (text === "1" || text === "2")) {
+    normalizedText = text === "1" ? "reserva" : "autorizacion";
   }
 
+  // Si no hay una conversación activa y el usuario elige una opción válida
+  if (!conversations[from] && validOptions.includes(normalizedText)) {
+    conversations[from] = { step: 0, data: {}, documentType: normalizedText };
+    startTimeout(from);
+    const questions =
+      normalizedText === "reserva" ? reserva_questions : autorizacion_questions;
+    return formatQuestionWithOptions(questions[0]);
+  }
+
+  // Si hay una conversación activa, continuar con el flujo
+  const userConversation = conversations[from];
   const currentStep = userConversation.step;
   const questions =
     userConversation.documentType === "reserva"
@@ -93,15 +104,18 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       : autorizacion_questions;
   const currentQuestion = questions[currentStep];
 
+  // Validar si la pregunta tiene opciones y si la respuesta es válida
   if (currentQuestion.options) {
     const validOptionValues = currentQuestion.options
       .map((opt) => opt.value)
-      .concat(["__________"]);
+      .concat(["__________"]); // Asegúrate de usar 10 guiones
+
     if (!validOptionValues.includes(text)) {
       return `❌ Opción no válida...`;
     }
+
     if (text === "9") {
-      userConversation.data[currentQuestion.key] = "__________";
+      userConversation.data[currentQuestion.key] = "__________"; // Guardamos 10 guiones
     } else {
       const selectedOption = currentQuestion.options.find(
         (opt) => opt.value === text
@@ -120,57 +134,93 @@ export const handleUserResponse = async (from: string, messageText: string) => {
     userConversation.step++;
     startTimeout(from);
     return formatQuestionWithOptions(questions[userConversation.step]);
-  }
-
-  try {
-    const company = getCompanyByPhone(from);
-    if (!company || !company.styles)
-      throw new Error("Empresa o estilos no encontrados");
-
-    const template =
-      userConversation.documentType === "reserva"
-        ? company.templates.reserva
-        : company.templates.autorizacion;
-
-    const fileBuffer = await generateAndDownloadWord(
-      template,
-      userConversation.data,
-      company.styles
+  } else {
+    console.log(
+      `✅ Formulario completado por: ${from}\n`,
+      JSON.stringify(userConversation.data, null, 2)
     );
+    try {
+      const company = getCompanyByPhone(from);
+      if (!company)
+        throw new Error(
+          "No se encontró la empresa asociada al número de WhatsApp."
+        );
+      if (!company.styles)
+        throw new Error("No se encontraron estilos definidos para la empresa.");
+      const template =
+        userConversation.documentType === "reserva"
+          ? company.templates.reserva
+          : company.templates.autorizacion;
+      if (!template)
+        throw new Error(
+          `No se encontró un template para ${userConversation.documentType}`
+        );
+      const fileBuffer = await generateAndDownloadWord(
+        template,
+        userConversation.data,
+        company.styles
+      );
+      const now = Date.now();
+      const fileKey = `${userConversation.data.nombreDocumento}.docx`;
+      const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
+      await sendWhatsAppMessage(
+        from,
+        `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
+      );
 
-    const fileKey = `${userConversation.data.nombreDocumento}.docx`;
-    const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
+      if (!userConversation.documentType) {
+        throw new Error("El tipo de documento es indefinido.");
+      }
 
-    await sendWhatsAppMessage(
-      from,
-      `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
-    );
+      console.log("📄 Preparando para registrar documento en Andes Docs...");
 
-    await registerDocumentInAndesDocs(
-      from,
-      userConversation.data.documentType,
-      fileKey,
-      fileUrl,
-      fileBuffer,
-      userConversation.data.nombreDocumento
-    );
+      const userDocName = userConversation.data.nombreDocumento?.trim();
+      const docName =
+        userDocName || `WA-${now}-${userConversation.documentType}`;
 
-    delete conversations[from];
-    return `✅ Tu documento ${userConversation.data.nombreDocumento} ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`;
-  } catch (error) {
-    console.error("❌ Error al generar documento:", error);
-    return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";
+      await registerDocumentInAndesDocs(
+        from,
+        userConversation.documentType,
+        fileKey,
+        fileUrl,
+        fileBuffer,
+        docName
+      );
+      console.log("✅ Documento registrado exitosamente en Andes Docs");
+
+      delete conversations[from];
+
+      userConversation.signatureStep = 0;
+      return "Gracias, la información ha sido registrada con éxito.\n¿Desea enviar este documento a firma electrónica?\n1. Sí\n2. No";
+    } catch (error) {
+      console.error("❌ Error al generar documento:", error);
+      return "Hubo un error al generar tu documento. Inténtalo nuevamente más tarde.";
+    }
   }
 };
 
+// Función para formatear preguntas con opciones
 const formatQuestionWithOptions = (question: Question) => {
-  const optionsText =
-    question.options?.map((opt) => `${opt.value}. ${opt.label}`).join("\n") ||
-    "";
-  const additionalOptions = question.options
-    ? "\n9. Aún no tengo la respuesta\n0. Para reiniciar el proceso."
-    : "\n0. Para reiniciar el proceso.";
-  return `${question.question}${
-    optionsText ? "\n" + optionsText : ""
-  }${additionalOptions}`;
+  let options = question.options ? [...question.options] : [];
+
+  // Verifica si la pregunta ya tiene opciones numéricas
+  const hasNumericOptions = options.some((opt) => /^\d+$/.test(opt.value));
+
+  // Detecta si la pregunta solicita solo números explícitamente
+  const asksForNumbersOnly = question.question.includes("Escriba sólo números");
+
+  // Formatear las opciones en texto
+  const optionsText = options
+    .map((opt) => `${opt.value}. ${opt.label}`)
+    .join("\n");
+
+  // Agregar opciones adicionales según corresponda
+  let additionalOptions = "\n0. Para reiniciar el proceso.";
+
+  // No agregar la opción 9 si la pregunta ya tiene números o si pide solo números
+  if (!hasNumericOptions && !asksForNumbersOnly) {
+    additionalOptions = "\n9. Aún no tengo la respuesta" + additionalOptions;
+  }
+
+  return `${question.question}\n${optionsText}${additionalOptions}`;
 };

@@ -69,18 +69,18 @@ export const handleSignatureFlow = async (from: string, text: string) => {
         sigConv.currentSignerIndex! + 1
       }:`;
     } else {
-      console.log("DATA FOR ANDES DOCS ENDPOINT:", {
-        phone: sigConv.from,
-        documentId: sigConv.documentId,
-        documentKind: sigConv.documentKind,
-        filePath: sigConv.filePath,
-        signers: sigConv.signers,
-      });
+      let kind = "";
+
+      if (sigConv.documentKind === "reserva") {
+        kind = "Reserva";
+      } else {
+        kind = "Autorización";
+      }
 
       await sendToSignDocumentWithAndesDocs({
         phoneNumber: sigConv.from,
         documentId: sigConv.documentId,
-        documentKind: sigConv.documentKind,
+        documentKind: kind,
         filePath: sigConv.filePath,
         signers: sigConv.signers,
       });

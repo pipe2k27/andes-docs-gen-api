@@ -7,11 +7,11 @@ import {
   Paragraph,
   TextRun,
 } from "docx";
-import { fabianAchavalHeader } from "./logos/fabian_achaval_logo";
+import { andes_docs_header } from "./logos/andes_logo";
 
-export const styles_fabian_achaval = {
-  companyId: ["12392"],
-  companyName: "FabianAchaval",
+export const styles_andes = {
+  companyId: ["12348"],
+  companyName: "Andes Docs",
   font: "Arial",
   titleSize: 21,
   textSize: 21,
@@ -30,7 +30,7 @@ export const styles_fabian_achaval = {
         alignment: AlignmentType.RIGHT,
         children: [
           new ImageRun({
-            data: fabianAchavalHeader,
+            data: andes_docs_header,
             transformation: {
               width: 190.69,
               height: 43,

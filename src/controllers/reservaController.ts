@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { generateAndDownloadWord } from "../utils/wordGeneration";
+import { generateAndDownloadWord } from "../utils/api_fabian_achaval_utils/generator_fabian_achaval/wordGeneration";
 import { validationResult } from "express-validator";
-import { reserva_template } from "../utils/document_templates";
 import { logRequest } from "../utils/logger";
+import { reserva_template } from "../utils/api_fabian_achaval_utils/document_templates";
 
 /**
  * @swagger

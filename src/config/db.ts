@@ -1,7 +1,7 @@
 import { Company } from "../models/Company";
-import { styles_fabian_achaval } from "../utils/document_styles/fabian-achaval";
-import { fa_reserva_template } from "../utils/document_templates/fa-reserva-template";
-import { fa_autorizacion_template } from "../utils/document_templates/fa-autorización-template";
+import { styles_andes } from "../utils/document_styles/andes-docs";
+import { andes_autorizacion_template } from "../utils/document_templates/andes-autorización-template";
+import { andes_reserva_template } from "../utils/document_templates/andes-reserva-template";
 
 export const companies: Company[] = [
   {
@@ -13,10 +13,10 @@ export const companies: Company[] = [
       "5491131073107",
       "54111531073107",
     ],
-    styles: styles_fabian_achaval,
+    styles: styles_andes,
     templates: {
-      reserva: fa_reserva_template,
-      autorizacion: fa_autorizacion_template,
+      reserva: andes_reserva_template,
+      autorizacion: andes_autorizacion_template,
     },
   },
   {

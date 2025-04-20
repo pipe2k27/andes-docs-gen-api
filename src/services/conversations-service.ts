@@ -7,12 +7,12 @@ import {
 import { generateAndDownloadWord } from "../utils/generator/wordGeneration";
 import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { getCompanyByPhone } from "../config/db";
-import { normalizeText } from "../utils/normalizeText";
 import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
 import {
   handleSignatureFlow,
   signatureConversations,
 } from "./esignature-service";
+import { normalizeText } from "../utils/generator/normalizeText";
 
 export const conversations: Record<
   string,

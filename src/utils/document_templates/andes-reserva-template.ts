@@ -1,4 +1,4 @@
-export const fa_reserva_template = {
+export const andes_reserva_template = {
   document: [
     {
       type: "title",

@@ -12,7 +12,7 @@ import {
   convertInchesToTwip,
 } from "docx";
 import { processAnswer, processDependencies } from "./TextProcessor";
-import { styles_fabian_achaval } from "./fabian-achaval";
+import { styles_fabian_achaval } from "../fabian-achaval";
 import NumeroALetras from "./numbersToLetters";
 
 type ParagraphType = {

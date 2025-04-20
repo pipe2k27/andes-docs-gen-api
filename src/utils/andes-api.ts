@@ -7,7 +7,7 @@ export interface Signer {
 }
 
 export type SignatureRequest = {
-  phone: string;
+  phoneNumber: string;
   documentId: string;
   documentKind: string;
   filePath: string;

@@ -78,7 +78,7 @@ export const handleSignatureFlow = async (from: string, text: string) => {
       });
 
       await sendToSignDocumentWithAndesDocs({
-        phone: sigConv.from,
+        phoneNumber: sigConv.from,
         documentId: sigConv.documentId,
         documentKind: sigConv.documentKind,
         filePath: sigConv.filePath,

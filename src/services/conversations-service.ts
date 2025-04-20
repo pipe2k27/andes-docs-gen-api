@@ -59,7 +59,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
   const validOptions = ["reserva", "autorizacion"];
 
   // Reiniciar el proceso si el usuario envía "0"
-  if (String(text) === "0") {
+  if (text === "0") {
     delete conversations[from];
     await sendWhatsAppMessage(from, "Reiniciaste el proceso.");
     await sendWhatsAppMessage(

@@ -13,6 +13,8 @@ import {
   signatureConversations,
 } from "./esignature-service";
 import { normalizeText } from "../utils/generator/normalizeText";
+import NumeroALetras from "../utils/generator/numbersToLetters";
+import { addTextToAmounts } from "../utils/generator/addTextToAmounts";
 
 export const conversations: Record<
   string,
@@ -158,13 +160,17 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         userConversation.documentType === "reserva"
           ? company.templates.reserva
           : company.templates.autorizacion;
+
       if (!template)
         throw new Error(
           `No se encontró un template para ${userConversation.documentType}`
         );
+
+      const formattedData = addTextToAmounts(userConversation.data);
+
       const fileBuffer = await generateAndDownloadWord(
         template,
-        userConversation.data,
+        formattedData,
         company.styles
       );
       const now = Date.now();

@@ -13,6 +13,7 @@ import {
 } from "docx";
 import { processAnswer, processDependencies } from "../generator/TextProcessor";
 import { DocumentStyles } from "../document_styles/Document";
+import NumeroALetras from "./numbersToLetters";
 
 type ParagraphType = {
   id: string;
@@ -45,6 +46,13 @@ export const processVariablesToString = (text: string, answers: any) => {
             // Manejar el caso de "9" o "__________"
             if (answerValue === "9" || answerValue === "__________") {
               return "__________";
+            }
+
+            // Si es número, convertir a letras
+            if (typeof answerValue === "number") {
+              const inWords = NumeroALetras(answerValue);
+              const formatted = `${inWords} ${answerValue}`;
+              return isBold ? `[${formatted}]` : formatted;
             }
 
             // Procesar la respuesta normalmente

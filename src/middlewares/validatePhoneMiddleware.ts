@@ -29,7 +29,10 @@ export const validatePhoneMiddleware = async (
 
   if (!isAuthorized) {
     console.log(`⛔ Número no autorizado: ${from}`);
-    await sendWhatsAppMessage(from, "Lo siento, usted no tiene poder aquí.");
+    await sendWhatsAppMessage(
+      from,
+      "Lo siento, usted no tiene acceso. Debe comunicarse con soporte. Disculpe las molestias"
+    );
     res.sendStatus(403);
     return;
   }

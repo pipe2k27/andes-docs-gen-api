@@ -92,20 +92,16 @@ export const handleUserResponse = async (from: string, messageText: string) => {
   // Si no hay una conversación activa y el mensaje no es una opción válida
   if (
     !conversations[from] &&
-    !validOptions.includes(normalizedText) &&
-    text !== "1" &&
-    text !== "2"
+    !uploadConversations[from] &&
+    !signatureConversations[from] &&
+    !["1", "2", "3"].includes(text) &&
+    !validOptions.includes(normalizedText)
   ) {
-    // Enviar mensaje de bienvenida solo si no hay una conversación activa
     await sendWhatsAppMessage(
       from,
-      "*¡Hola! Gracias por trabajar con Andes Docs🏔️⚡!* ¿Qué documento necesita generar hoy?"
+      "*¡Hola! Gracias por trabajar con Andes Docs🏔️⚡!*"
     );
-    await sendWhatsAppMessage(
-      from,
-      "Por favor, elegí una opción para continuar."
-    );
-    return "1. Reserva\n2. Autorización\n3. Enviar documento a firmar\n\n0. Para reiniciar el proceso";
+    return "¿Qué documento necesitas gestionar hoy?\n\n1. Generar Reserva\n2. Generar Autorización\n3. Enviar documento a firmar\n\n0. Reiniciar el proceso";
   }
 
   // Si no hay una conversación activa y el usuario elige una opción (1 o 2)

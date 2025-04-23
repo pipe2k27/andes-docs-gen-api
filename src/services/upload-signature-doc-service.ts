@@ -7,7 +7,11 @@ import { downloadWhatsAppMedia } from "../utils/downloadWhatsappMedia";
 
 export const uploadConversations: Record<string, { step: number }> = {};
 
-export const handleUploadFlow = async (from: string, messageText: string) => {
+export const handleUploadFlow = async (
+  from: string,
+  messageText: string,
+  documentId?: string // <- este nuevo parámetro
+) => {
   const state = uploadConversations[from];
 
   if (state.step === 0) {
@@ -19,8 +23,8 @@ export const handleUploadFlow = async (from: string, messageText: string) => {
     return;
   }
 
-  if (state.step === 1 && messageText.startsWith("media:")) {
-    const mediaId = messageText.replace("media:", "").trim();
+  if (state.step === 1 && documentId) {
+    const mediaId = documentId.trim();
 
     try {
       const fileBuffer = await downloadWhatsAppMedia(mediaId);

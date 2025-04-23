@@ -67,19 +67,19 @@ export const reserva_questions: Question[] = [
   {
     key: "montoReserva",
     question:
-      "¿Cuál es el *monto* en *dólares* que se ha pagado como reserva? (Escriba sólo números)",
+      "¿Cuál es el *monto* en *dólares* que se ha pagado como reserva? (Escriba sólo números, sin puntos ni comas)",
     format: "numberWithLetters",
   },
   {
     key: "diasValidezReserva",
     question:
-      "¿Por cuántos *días* es válida la reserva? (Escriba sólo números)",
+      "¿Por cuántos *días* es válida la reserva? (Escriba sólo números, sin puntos ni comas)",
     format: "numberWithLetters",
   },
   {
     key: "valorInmueble",
     question:
-      "¿Cuál es el *precio* total del inmueble en *dólares*? (Escriba sólo números)",
+      "¿Cuál es el *precio* total del inmueble en *dólares*? (Escriba sólo números, sin puntos ni comas)",
     format: "numberWithLetters",
   },
   {

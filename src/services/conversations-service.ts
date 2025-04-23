@@ -18,6 +18,10 @@ import {
   formatText,
   validateTextFormat,
 } from "../utils/generator/validationsAndFormatting";
+import {
+  handleUploadFlow,
+  uploadConversations,
+} from "./upload-signature-doc-service";
 
 const validOptions = ["reserva", "autorizacion"];
 
@@ -55,14 +59,24 @@ const startTimeout = (from: string) => {
 };
 
 export const handleUserResponse = async (from: string, messageText: string) => {
+  let text = messageText.trim();
+  console.log(`🔍 Texto recibido: ${text}`);
+  let normalizedText = normalizeText(text);
+
+  // Manejo del nuevo flujo de carga de documento
+  if (uploadConversations[from]) {
+    return await handleUploadFlow(from, messageText);
+  }
+
+  // Opción 3 - flujo inicial
+  if (!conversations[from] && text === "3") {
+    uploadConversations[from] = { step: 0 };
+    return await handleUploadFlow(from, messageText);
+  }
+
   if (signatureConversations[from]) {
     return await handleSignatureFlow(from, messageText);
   }
-
-  let text = messageText.trim();
-  console.log(`🔍 Texto recibido: ${text}`);
-
-  let normalizedText = normalizeText(text);
 
   // Reiniciar el proceso si el usuario envía "0"
   if (text === "0") {
@@ -91,7 +105,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       from,
       "Por favor, elegí una opción para continuar."
     );
-    return "1. Reserva\n2. Autorización\n\n0. Para reiniciar el proceso";
+    return "1. Reserva\n2. Autorización\n3. Enviar documento a firmar\n\n0. Para reiniciar el proceso";
   }
 
   // Si no hay una conversación activa y el usuario elige una opción (1 o 2)
@@ -198,7 +212,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         userConversation.data,
         company.styles
       );
-      const now = Date.now();
+
       const fileKey = `${userConversation.data.nombreDocumento}.docx`;
       const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
       await sendWhatsAppMessage(
@@ -219,7 +233,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       console.log("📄 Preparando para registrar documento en Andes Docs...");
 
       const docName =
-        userDocName || `WA-${now}-${userConversation.documentType}`;
+        userDocName || `${userConversation.documentType} Generada ${from}`;
 
       const date = Date.now();
 

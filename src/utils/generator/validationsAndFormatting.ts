@@ -44,7 +44,7 @@ export const formatText = (value: string, question: Question) => {
     if (!isNaN(num)) {
       formatted = `${num.toLocaleString("es")} (${NumeroALetras(
         num
-      ).toUpperCase()}`;
+      ).toUpperCase()})`;
     }
   }
 

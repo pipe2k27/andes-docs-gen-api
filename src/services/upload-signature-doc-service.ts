@@ -2,7 +2,6 @@ import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { s3StoreFile } from "../utils/s3Uploader";
 import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
 import { signatureConversations } from "./esignature-service";
-import { v4 as uuidv4 } from "uuid";
 import { getCompanyByPhone } from "../config/db";
 import { downloadWhatsAppMedia } from "../utils/downloadWhatsappMedia";
 
@@ -28,7 +27,8 @@ export const handleUploadFlow = async (from: string, messageText: string) => {
       const docName = `documento-${Date.now()}`;
       const fileKey = `${docName}.docx`;
       const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
-      const documentId = uuidv4();
+
+      console.log("fileUrl generado:", fileUrl);
 
       const company = getCompanyByPhone(from);
       if (!company) {
@@ -37,15 +37,27 @@ export const handleUploadFlow = async (from: string, messageText: string) => {
         );
       }
 
+      const now = Date.now();
+
+      const documentId = String(now);
+
       await registerDocumentInAndesDocs(
         from,
-        "reserva", // Puedes cambiar esto si deseas detectar otro tipo de documento
+        "Whatsapp Document",
         documentId,
         fileKey,
         fileUrl,
         fileBuffer,
         docName
       );
+
+      if (typeof fileUrl !== "string") {
+        console.error("fileUrl no es una cadena válida:", fileUrl);
+        return await sendWhatsAppMessage(
+          from,
+          "❌ Ocurrió un error al procesar el archivo. Intenta nuevamente."
+        );
+      }
 
       await sendWhatsAppMessage(
         from,
@@ -57,7 +69,7 @@ export const handleUploadFlow = async (from: string, messageText: string) => {
         from,
         filePath: fileKey, // Aquí estás usando `fileKey` como path en S3
         documentId,
-        documentKind: "Whatsapp Document", // o el que corresponda
+        documentKind: "Whatsapp Document",
         signers: [],
         step: 0,
       };

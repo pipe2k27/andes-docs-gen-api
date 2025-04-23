@@ -19,7 +19,7 @@ export const reserva_questions: Question[] = [
   {
     key: "fecha",
     question:
-      "¿Cuál es la *fecha* en la que se realiza la reserva? Ej: 25-12-2025 (Formato: DD-MM-AAAA)",
+      "¿Cuál es la *fecha* en la que se realiza la reserva? Ej: 4 de octubre del 2025",
   },
   {
     key: "tipoInmueble",
@@ -74,6 +74,7 @@ export const reserva_questions: Question[] = [
     key: "diasValidezReserva",
     question:
       "¿Por cuántos *días* es válida la reserva? (Escriba sólo números)",
+    format: "numberWithLetters",
   },
   {
     key: "valorInmueble",

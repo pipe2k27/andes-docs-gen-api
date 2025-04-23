@@ -21,11 +21,13 @@ import NumeroALetras from "./numbersToLetters";
 //   return result;
 // };
 
-export const validateTextFormat = (value: string, question: Question) => {
+export const validateTextFormat = (
+  value: string,
+  question: Question
+): true | string => {
   if (question.format === "number" || question.format === "numberWithLetters") {
-    const num = Number(value);
-    if (isNaN(num)) {
-      return false;
+    if (!/^\d+$/.test(value)) {
+      return "❗ Esperamos una respuesta numérica, por favor responde un número sin letras ni símbolos.";
     }
   }
 

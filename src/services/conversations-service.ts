@@ -119,20 +119,21 @@ export const handleUserResponse = async (from: string, messageText: string) => {
 
   // Validar si la pregunta tiene opciones y si la respuesta es válida
   if (currentQuestion.options) {
+    // Validar opción
     const validOptionValues = currentQuestion.options
       .map((opt) => opt.value)
-      .concat(["__________"]); // Asegúrate de usar 10 guiones
-
+      .concat(["__________"]);
     if (!validOptionValues.includes(text)) {
       return `❌ Opción no válida...`;
     }
 
-    if (!validateTextFormat(text, currentQuestion)) {
-      return `❌ Opción no válida...`;
+    const validationResult = validateTextFormat(text, currentQuestion);
+    if (validationResult !== true) {
+      return validationResult; // Mensaje personalizado
     }
 
     if (text === "9") {
-      userConversation.data[currentQuestion.key] = "__________"; // Guardamos 10 guiones
+      userConversation.data[currentQuestion.key] = "__________";
     } else {
       const selectedOption = currentQuestion.options.find(
         (opt) => opt.value === text
@@ -141,6 +142,12 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         selectedOption?.label || text;
     }
   } else {
+    // Validar texto sin opciones
+    const validationResult = validateTextFormat(text, currentQuestion);
+    if (validationResult !== true) {
+      return validationResult;
+    }
+
     userConversation.data[currentQuestion.key] = formatText(
       text,
       currentQuestion
@@ -179,6 +186,13 @@ export const handleUserResponse = async (from: string, messageText: string) => {
 
       // const formattedData = addTextToAmounts(userConversation.data);
 
+      const userDocName = userConversation.data.nombreDocumento?.trim();
+
+      // Validación adicional antes de proceder
+      if (!userDocName || userDocName === "1" || userDocName === "2") {
+        return "⚠️ El nombre del documento no es válido. Por favor, responde con un nombre adecuado.";
+      }
+
       const fileBuffer = await generateAndDownloadWord(
         template,
         userConversation.data,
@@ -204,7 +218,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
 
       console.log("📄 Preparando para registrar documento en Andes Docs...");
 
-      const userDocName = userConversation.data.nombreDocumento?.trim();
       const docName =
         userDocName || `WA-${now}-${userConversation.documentType}`;
 

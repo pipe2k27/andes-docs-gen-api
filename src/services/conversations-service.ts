@@ -14,7 +14,12 @@ import {
 } from "./esignature-service";
 import { normalizeText } from "../utils/generator/normalizeText";
 import NumeroALetras from "../utils/generator/numbersToLetters";
-import { addTextToAmounts } from "../utils/generator/addTextToAmounts";
+import {
+  formatText,
+  validateTextFormat,
+} from "../utils/generator/validationsAndFormatting";
+
+const validOptions = ["reserva", "autorizacion"];
 
 export const conversations: Record<
   string,
@@ -58,7 +63,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
   console.log(`🔍 Texto recibido: ${text}`);
 
   let normalizedText = normalizeText(text);
-  const validOptions = ["reserva", "autorizacion"];
 
   // Reiniciar el proceso si el usuario envía "0"
   if (text === "0") {
@@ -123,6 +127,10 @@ export const handleUserResponse = async (from: string, messageText: string) => {
       return `❌ Opción no válida...`;
     }
 
+    if (!validateTextFormat(text, currentQuestion)) {
+      return `❌ Opción no válida...`;
+    }
+
     if (text === "9") {
       userConversation.data[currentQuestion.key] = "__________"; // Guardamos 10 guiones
     } else {
@@ -133,7 +141,10 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         selectedOption?.label || text;
     }
   } else {
-    userConversation.data[currentQuestion.key] = text;
+    userConversation.data[currentQuestion.key] = formatText(
+      text,
+      currentQuestion
+    );
   }
 
   clearTimeout(userConversation.timeout);
@@ -166,11 +177,11 @@ export const handleUserResponse = async (from: string, messageText: string) => {
           `No se encontró un template para ${userConversation.documentType}`
         );
 
-      const formattedData = addTextToAmounts(userConversation.data);
+      // const formattedData = addTextToAmounts(userConversation.data);
 
       const fileBuffer = await generateAndDownloadWord(
         template,
-        formattedData,
+        userConversation.data,
         company.styles
       );
       const now = Date.now();

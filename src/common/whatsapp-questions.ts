@@ -7,6 +7,7 @@ export type Question = {
   key: string;
   question: string;
   options?: Option[];
+  format?: "numberWithLetters" | "number";
 };
 
 export const reserva_questions: Question[] = [
@@ -67,6 +68,7 @@ export const reserva_questions: Question[] = [
     key: "montoReserva",
     question:
       "¿Cuál es el *monto* en *dólares* que se ha pagado como reserva? (Escriba sólo números)",
+    format: "numberWithLetters",
   },
   {
     key: "diasValidezReserva",
@@ -77,6 +79,7 @@ export const reserva_questions: Question[] = [
     key: "valorInmueble",
     question:
       "¿Cuál es el *precio* total del inmueble en *dólares*? (Escriba sólo números)",
+    format: "numberWithLetters",
   },
   {
     key: "nombreVendedor",

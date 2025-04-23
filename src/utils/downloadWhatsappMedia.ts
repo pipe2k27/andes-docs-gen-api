@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL!;
-const WHATSAPP_API_TOKEN = process.env.WHATS_VERIFY_TOKEN!;
+const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
+const WHATSAPP_API_TOKEN = process.env.WHATS_VERIFY_TOKEN;
 
 export const downloadWhatsAppMedia = async (
   mediaId: string

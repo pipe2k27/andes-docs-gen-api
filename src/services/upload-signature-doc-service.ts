@@ -1,83 +1,83 @@
-// services/upload-signature-service.ts
-import { s3StoreFile } from "../utils/s3Uploader";
 import { sendWhatsAppMessage } from "../controllers/whatsappController";
-import { getCompanyByPhone } from "../config/db";
+import { s3StoreFile } from "../utils/s3Uploader";
 import { registerDocumentInAndesDocs } from "./upload-document-reference-service";
 import { signatureConversations } from "./esignature-service";
+import { v4 as uuidv4 } from "uuid";
+import { getCompanyByPhone } from "../config/db";
+import { downloadWhatsAppMedia } from "../utils/downloadWhatsappMedia";
 
-type UploadConversation = {
-  step: number;
-  fileName?: string;
-};
+export const uploadConversations: Record<string, { step: number }> = {};
 
-export const uploadConversations: Record<string, UploadConversation> = {};
+export const handleUploadFlow = async (from: string, messageText: string) => {
+  const state = uploadConversations[from];
 
-export const handleUploadFlow = async (
-  from: string,
-  message: string,
-  mediaUrl?: string,
-  mimeType?: string
-) => {
-  const convo = uploadConversations[from] || { step: 0 };
-
-  if (convo.step === 0) {
+  if (state.step === 0) {
     await sendWhatsAppMessage(
       from,
-      "📄 Por favor, envíanos el archivo .docx que deseas enviar a firmar."
+      "📎 Por favor, envía el archivo `.docx` que deseas subir y firmar."
     );
-    uploadConversations[from] = { step: 1 };
+    state.step++;
     return;
   }
 
-  if (convo.step === 1) {
-    if (
-      !mediaUrl ||
-      !mimeType ||
-      !mimeType.includes(
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      )
-    ) {
-      return "❌ El archivo debe ser un documento Word (.docx). Intenta nuevamente.";
-    }
+  if (state.step === 1 && messageText.startsWith("media:")) {
+    const mediaId = messageText.replace("media:", "").trim();
 
-    const fileName = `upload-${Date.now()}.docx`;
-    const fileBuffer = await fetch(mediaUrl).then((res) => res.arrayBuffer());
+    try {
+      const fileBuffer = await downloadWhatsAppMedia(mediaId);
+      const docName = `documento-${Date.now()}`;
+      const fileKey = `${docName}.docx`;
+      const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
+      const documentId = uuidv4();
 
-    const fileUrl = await s3StoreFile(
-      "wa-generation",
-      fileName,
-      Buffer.from(fileBuffer)
-    );
+      const company = getCompanyByPhone(from);
+      if (!company) {
+        throw new Error(
+          "No se encontró la empresa asociada al número de WhatsApp."
+        );
+      }
 
-    const company = getCompanyByPhone(from);
-    if (!company) {
+      await registerDocumentInAndesDocs(
+        from,
+        "reserva", // Puedes cambiar esto si deseas detectar otro tipo de documento
+        documentId,
+        fileKey,
+        fileUrl,
+        fileBuffer,
+        docName
+      );
+
+      await sendWhatsAppMessage(
+        from,
+        `✅ Tu documento fue cargado con éxito y está listo para enviarse a firma. Puedes verlo aquí:\n${fileUrl}`
+      );
+
+      // Iniciar flujo de firma electrónica
+      signatureConversations[from] = {
+        from,
+        filePath: fileKey, // Aquí estás usando `fileKey` como path en S3
+        documentId,
+        documentKind: "Whatsapp Document", // o el que corresponda
+        signers: [],
+        step: 0,
+      };
+
       delete uploadConversations[from];
-      return "❌ No se encontró la empresa asociada a este número.";
+      return await sendWhatsAppMessage(
+        from,
+        "¿Deseas enviar este documento a firma electrónica?\n1. Sí\n2. No"
+      );
+    } catch (err) {
+      console.error("Error al procesar el archivo:", err);
+      return await sendWhatsAppMessage(
+        from,
+        "❌ Ocurrió un error al procesar el archivo. Asegúrate de enviar un archivo válido `.docx`."
+      );
     }
-
-    const documentId = Date.now().toString();
-    const docName = `Documento Subido ${from}`;
-
-    await registerDocumentInAndesDocs(
-      from,
-      "documento_subido",
-      documentId,
-      fileName,
-      fileUrl,
-      Buffer.from(fileBuffer),
-      docName
-    );
-
-    signatureConversations[from] = {
-      from,
-      filePath: fileName,
-      documentId,
-      documentKind: "documento_subido",
-      signers: [],
-      step: 0,
-    };
-
-    delete uploadConversations[from];
-    return "✅ Documento subido correctamente. Ahora procederemos a la firma...\n\n1. Sí\n2. No";
   }
+
+  return await sendWhatsAppMessage(
+    from,
+    "⚠️ Esperamos un archivo `.docx`. Por favor, intenta de nuevo."
+  );
 };

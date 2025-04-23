@@ -22,7 +22,7 @@ import NumeroALetras from "./numbersToLetters";
 // };
 
 export const validateTextFormat = (value: string, question: Question) => {
-  if (question.format === "number" || "numberWithLetters") {
+  if (question.format === "number" || question.format === "numberWithLetters") {
     const num = Number(value);
     if (isNaN(num)) {
       return false;
@@ -37,12 +37,12 @@ export const validateTextFormat = (value: string, question: Question) => {
 export const formatText = (value: string, question: Question) => {
   let formatted: string = value;
 
-  if (question.format === "number" || "numberWithLetters") {
+  if (question.format === "number" || question.format === "numberWithLetters") {
     const num = Number(value);
     if (!isNaN(num)) {
       formatted = `${num.toLocaleString("es")} (${NumeroALetras(
         num
-      ).toUpperCase()})`;
+      ).toUpperCase()}`;
     }
   }
 

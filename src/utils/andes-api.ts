@@ -1,6 +1,10 @@
+import dotenv from "dotenv";
 import axios from "axios";
 import { getAuth0Token } from "./auth0";
 
+dotenv.config();
+
+const ANDES_API = process.env.ANDES_DOCS_API;
 export interface Signer {
   name: string;
   email: string;
@@ -19,7 +23,7 @@ export const sendDocReferenceToAndesDocs = async (docData: any) => {
     const token = await getAuth0Token();
 
     const response = await axios.post(
-      "https://andes-docs-develop-api.onrender.com/doc-ref/external-create-doc-ref",
+      `${ANDES_API}/doc-ref/external-create-doc-ref`,
       docData,
       {
         headers: {
@@ -42,7 +46,7 @@ export const sendToSignDocumentWithAndesDocs = async (
     const token = await getAuth0Token();
 
     const response = await axios.post(
-      `https://andes-docs-develop-api.onrender.com/electronic-signature/external-request-new-signature`,
+      `${ANDES_API}/electronic-signature/external-request-new-signature`,
       payload,
       {
         headers: {

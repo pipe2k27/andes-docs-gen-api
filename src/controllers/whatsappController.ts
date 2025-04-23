@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const WHATSAPP_API_URL = "https://graph.facebook.com/v22.0";
+const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 const ACCESS_TOKEN = process.env.WHATS_VERIFY_TOKEN;
 

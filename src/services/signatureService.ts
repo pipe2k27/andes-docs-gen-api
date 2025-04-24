@@ -123,6 +123,7 @@ class SignatureService {
       "Perfecto! el proceso ha finalizado, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de Andes Docs 🏔️"
     );
     delete signatureStates[from];
+    documentService.clearDocumentGeneration(from);
   }
 
   private async sendForSignature(from: string) {

@@ -5,11 +5,11 @@ import { s3StoreFile } from "../utils/s3Uploader";
 import {
   reserva_questions,
   autorizacion_questions,
+  Question,
 } from "../common/whatsapp-questions";
 import { registerDocumentInAndesDocs } from "./registerDocumentInAndesDocs";
 import { signatureService } from "./signatureService";
 import NumeroALetras from "../utils/generator/numbersToLetters";
-import { Question } from "../types/Questions";
 
 type DocumentGenerationState = {
   step: number;

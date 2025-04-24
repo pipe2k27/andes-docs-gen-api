@@ -1,4 +1,14 @@
-import { Question } from "../types/Questions";
+export type Question = {
+  key: string;
+  question: string;
+  options?: Option[];
+  format?: "number" | "numberAndLetters" | "email" | "text";
+};
+
+export type Option = {
+  value: string;
+  label: string;
+};
 
 export const reserva_questions: Question[] = [
   {

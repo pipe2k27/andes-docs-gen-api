@@ -56,8 +56,7 @@ class UploadService {
         "📤 Ahora por favor envía el archivo .docx\n\n" +
           "Asegúrate de que:\n" +
           "• Es un documento Word (.docx)\n" +
-          "• Tiene menos de 5MB\n" +
-          "• Esté correctamente firmado si es necesario"
+          "• Tiene menos de 5MB\n"
       );
 
       return true;

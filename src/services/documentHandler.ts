@@ -9,7 +9,7 @@ export async function handleDocumentMessage(from: string, message: any) {
     const doc = message.document;
     const fileName = doc.filename || "documento.docx";
 
-    // Validar tipo de archivo primero
+    // 1. Validate file type
     if (!fileName.toLowerCase().endsWith(".docx")) {
       await sendWhatsAppMessage(
         from,
@@ -19,37 +19,60 @@ export async function handleDocumentMessage(from: string, message: any) {
       return;
     }
 
-    // Procesar documento
-    const { fileUrl, fileKey, fileBuffer } = await handleDocumentUpload(
-      doc.id,
-      fileName
-    );
+    // 2. Process document upload to S3
+    let uploadResult;
+    try {
+      uploadResult = await handleDocumentUpload(doc.id, fileName);
+    } catch (uploadError) {
+      console.error("Error uploading to S3:", uploadError);
+      throw new Error(
+        "❌ Falló la subida del documento a S3. Por favor, inténtalo de nuevo."
+      );
+    }
 
-    // Obtener nombre del documento si está en flujo de subida
+    const { fileUrl, fileKey, fileBuffer } = uploadResult;
+
+    // 3. Get document name from upload state or filename
     const uploadState = uploadService.getState(from);
     const docName = uploadState?.docName || fileName.replace(".docx", "");
 
-    // Registrar en Andes Docs
-    await registerDocumentInAndesDocs(
-      from,
-      "documento_subido",
-      Date.now().toString(),
-      fileKey,
-      fileUrl,
-      fileBuffer,
-      docName
-    );
+    // 4. Register in Andes Docs
+    try {
+      await registerDocumentInAndesDocs(
+        from,
+        "documento_subido",
+        Date.now().toString(),
+        fileKey,
+        fileUrl,
+        fileBuffer,
+        docName
+      );
+    } catch (registrationError) {
+      console.error("Error registering in Andes Docs:", registrationError);
+      throw new Error(
+        "❌ Falló el registro en Andes Docs. El documento se subió pero no se registró."
+      );
+    }
 
-    // Limpiar estado de subida si existe
+    // 5. Clear upload state if exists
     uploadService.clearState(from);
 
-    // Preguntar por firma
-    await signatureService.initSignatureFlow(
-      from,
-      fileKey,
-      Date.now().toString(),
-      "documento_subido"
-    );
+    // 6. Ask about signature
+    try {
+      await signatureService.initSignatureFlow(
+        from,
+        fileKey,
+        Date.now().toString(),
+        "documento_subido"
+      );
+    } catch (signatureError) {
+      console.error("Error initiating signature flow:", signatureError);
+      await sendWhatsAppMessage(
+        from,
+        "✅ Documento subido y registrado correctamente, pero hubo un error al preparar la firma.\n\n" +
+          "Puedes gestionar la firma directamente en la plataforma de Andes Docs."
+      );
+    }
   } catch (error) {
     console.error("Error en handleDocumentMessage:", error);
 
@@ -60,7 +83,7 @@ export async function handleDocumentMessage(from: string, message: any) {
         : "❌ Error al procesar el documento. Por favor, inténtalo de nuevo."
     );
 
-    // Reintentar flujo de subida si estaba en progreso
+    // Retry upload flow if it was in progress
     if (uploadService.getState(from)) {
       await sendWhatsAppMessage(
         from,

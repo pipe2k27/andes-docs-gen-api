@@ -224,23 +224,15 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         `✅ Tu documento *${userConversation.data.nombreDocumento}* ha sido generado con éxito. Puedes descargarlo aquí: ${fileUrl}`
       );
 
-      await sendWhatsAppMessage(
-        from,
-        "¿Desea enviar a *firmar* el documento generado?"
-      );
-      await sendWhatsAppMessage(from, "1. Sí\n2. No");
-
       if (!userConversation.documentType) {
         throw new Error("El tipo de documento es indefinido.");
       }
 
-      console.log("📄 Preparando para registrar documento en Andes Docs...");
-
+      const date = Date.now();
       const docName =
         userDocName || `${userConversation.documentType} Generada ${from}`;
 
-      const date = Date.now();
-
+      // Registrar documento
       await registerDocumentInAndesDocs(
         from,
         userConversation.documentType,
@@ -250,16 +242,27 @@ export const handleUserResponse = async (from: string, messageText: string) => {
         fileBuffer,
         docName
       );
+
       console.log("✅ Documento registrado exitosamente en Andes Docs");
 
+      // Eliminar la conversación actual para evitar ambigüedad
+      delete conversations[from];
+
+      // Iniciar el flujo de firma electrónica
       signatureConversations[from] = {
         from,
-        filePath: fileKey, // o la URL si eso requiere el endpoint
+        filePath: fileKey,
         documentId: String(date),
         documentKind: userConversation.documentType,
         signers: [],
         step: 0,
       };
+
+      // Enviar mensaje de pregunta para firma
+      await sendWhatsAppMessage(
+        from,
+        "¿Desea enviar a *firmar* el documento generado?\n\n1. Sí\n2. No"
+      );
 
       return;
     } catch (error) {

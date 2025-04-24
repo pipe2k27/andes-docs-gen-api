@@ -21,23 +21,17 @@ export const handleSignatureFlow = async (from: string, text: string) => {
   // Si aún no existe, espera a que se cree en handleUserResponse
   if (!sigConv) return null;
 
-  if (sigConv.step === 0) {
-    if (text === "1") {
-      delete conversations[from]; // 🔄 Solo borrar si elige sí
-      sigConv.step++;
-      return "¿Cuántos *firmantes* serán? (Máximo 10)";
-    } else if (text === "2") {
-      await sendWhatsAppMessage(
-        from,
-        "Perfecto! el proceso ha finalizado, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de Andes Docs 🏔️"
-      );
-      // 🔧 Limpiar los estados
-      delete signatureConversations[from];
-      delete conversations[from];
-      return;
-    } else {
-      return "Opción no válida. Por favor, responde 1 para Sí o 2 para No.";
-    }
+  const trimmed = text.trim();
+
+  // ✅ Si el usuario responde que NO desea firmar (opción 2)
+  if (sigConv.step === 0 && trimmed === "2") {
+    delete signatureConversations[from];
+    await sendWhatsAppMessage(
+      from,
+      "Perfecto! el proceso ha finalizado, la información ha sido registrada con éxito.\nPuede visualizar el documento en la plataforma de Andes Docs 🏔️"
+    );
+    delete conversations[from]; // limpiar conversación anterior también
+    return;
   }
 
   if (sigConv.step === 1) {

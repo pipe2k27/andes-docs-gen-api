@@ -204,8 +204,6 @@ export const handleUserResponse = async (from: string, messageText: string) => {
           `No se encontró un template para ${userConversation.documentType}`
         );
 
-      // const formattedData = addTextToAmounts(userConversation.data);
-
       const userDocName = userConversation.data.nombreDocumento?.trim();
 
       // Validación adicional antes de proceder

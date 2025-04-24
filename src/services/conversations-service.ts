@@ -13,7 +13,6 @@ import {
   signatureConversations,
 } from "./esignature-service";
 import { normalizeText } from "../utils/generator/normalizeText";
-import NumeroALetras from "../utils/generator/numbersToLetters";
 import {
   formatText,
   validateTextFormat,
@@ -25,17 +24,29 @@ import {
 
 const validOptions = ["reserva", "autorizacion"];
 
-export const conversations: Record<
-  string,
-  {
-    step: number;
-    data: any;
-    documentType?: string;
-    timeout?: NodeJS.Timeout;
-  }
-> = {};
+export type Conversation = {
+  step: number;
+  data: any;
+  documentType?: string;
+  timeout?: NodeJS.Timeout;
+};
 
-const startTimeout = (from: string) => {
+export const conversations: Record<string, Conversation> = {};
+
+export const restartConversation = async (from: string, text: string) => {
+  // Reiniciar el proceso si el usuario envía "0"
+  if (text === "0") {
+    delete conversations[from];
+    await sendWhatsAppMessage(from, "Reiniciaste el proceso.");
+    await sendWhatsAppMessage(
+      from,
+      "Por favor, sigue las instrucciones para continuar."
+    );
+    return "🔄 Has reiniciado el proceso. ¿Qué documento necesitas gestionar hoy?\n\n1. Generar Reserva\n2. Generar Autorización\n3. Enviar documento a firmar\n";
+  }
+};
+
+export const startTimeout = (from: string) => {
   if (!conversations[from]) return;
 
   conversations[from].timeout = setTimeout(async () => {
@@ -70,7 +81,15 @@ export const handleUserResponse = async (from: string, messageText: string) => {
 
   // Opción 3 - flujo inicial
   if (!conversations[from] && text === "3") {
-    uploadConversations[from] = { step: 0 };
+    uploadConversations[from] = {
+      from,
+      filePath: "",
+      documentId: "",
+      documentKind: "",
+      step: 0,
+      signers: [],
+    };
+
     return await handleUploadFlow(from, messageText);
   }
 
@@ -78,16 +97,7 @@ export const handleUserResponse = async (from: string, messageText: string) => {
     return await handleSignatureFlow(from, messageText);
   }
 
-  // Reiniciar el proceso si el usuario envía "0"
-  if (text === "0") {
-    delete conversations[from];
-    await sendWhatsAppMessage(from, "Reiniciaste el proceso.");
-    await sendWhatsAppMessage(
-      from,
-      "Por favor, sigue las instrucciones para continuar."
-    );
-    return "🔄 Has reiniciado el proceso. ¿Qué documento necesita generar hoy?\n 1. Reserva\n 2. Autorización";
-  }
+  await restartConversation(from, text);
 
   // Si no hay una conversación activa y el mensaje no es una opción válida
   if (

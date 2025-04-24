@@ -42,5 +42,11 @@ export const companies: Company[] = [
 ];
 
 export const getCompanyByPhone = (phone: string) => {
-  return companies.find((company) => company.whatsappNumbers.includes(phone));
+  const company = companies.find((c) => c.whatsappNumbers.includes(phone));
+  if (!company) return null;
+
+  return {
+    ...company,
+    styles: company.styles || styles_andes,
+  };
 };

@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import apiRoutes from "./routes/api";
-import webhookRoute from "./routes/webhookRoutes";
+import whatsappWebhookRoute from "./routes/whatsapp";
 import logRoutes from "./routes/logRoutes";
 
 import { swaggerSpec, swaggerUi } from "./config/swagger";
@@ -27,7 +27,7 @@ app.use("/FA", apiRoutes);
 
 app.use(logRoutes);
 
-app.use("/webhook", webhookRoute);
+app.use("/webhook", whatsappWebhookRoute);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

@@ -7,7 +7,7 @@ export type Question = {
   key: string;
   question: string;
   options?: Option[];
-  format?: "numberWithLetters" | "number";
+  format?: "email" | "text" | "number" | "numberWithLetters";
 };
 
 export const reserva_questions: Question[] = [
@@ -63,6 +63,7 @@ export const reserva_questions: Question[] = [
   {
     key: "emailReservante",
     question: "¿Cuál es el *correo electrónico* del reservante?",
+    format: "email",
   },
   {
     key: "montoReserva",

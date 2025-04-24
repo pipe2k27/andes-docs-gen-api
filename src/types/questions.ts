@@ -7,5 +7,5 @@ export type Question = {
   key: string;
   question: string;
   options?: Option[];
-  format?: "number" | "numberAndLetters" | "email";
+  format?: "number" | "numberAndLetters" | "email" | "text";
 };

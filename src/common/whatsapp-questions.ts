@@ -1,14 +1,4 @@
-export type Option = {
-  value: string;
-  label: string;
-};
-
-export type Question = {
-  key: string;
-  question: string;
-  options?: Option[];
-  format?: "email" | "text" | "number" | "numberWithLetters";
-};
+import { Question } from "../types/Questions";
 
 export const reserva_questions: Question[] = [
   {
@@ -69,19 +59,19 @@ export const reserva_questions: Question[] = [
     key: "montoReserva",
     question:
       "¿Cuál es el *monto* en *dólares* que se ha pagado como reserva? (Escriba sólo números, sin puntos ni comas)",
-    format: "numberWithLetters",
+    format: "numberAndLetters",
   },
   {
     key: "diasValidezReserva",
     question:
       "¿Por cuántos *días* es válida la reserva? (Escriba sólo números, sin puntos ni comas)",
-    format: "numberWithLetters",
+    format: "numberAndLetters",
   },
   {
     key: "valorInmueble",
     question:
       "¿Cuál es el *precio* total del inmueble en *dólares*? (Escriba sólo números, sin puntos ni comas)",
-    format: "numberWithLetters",
+    format: "numberAndLetters",
   },
   {
     key: "nombreVendedor",

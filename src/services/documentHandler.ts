@@ -5,48 +5,67 @@ import { signatureService } from "./signatureService";
 import { uploadService } from "./uploadService";
 
 export async function handleDocumentMessage(from: string, message: any) {
-  const state = uploadService.getState(from); // Necesitarías implementar este método
-  const docName =
-    state?.docName || message.document.filename.replace(".docx", "");
-  const doc = message.document;
-  const fileName = doc.filename || "documento.docx";
+  try {
+    const doc = message.document;
+    const fileName = doc.filename || "documento.docx";
 
-  // Validate file type
-  if (!fileName.endsWith(".docx")) {
+    // Validar tipo de archivo primero
+    if (!fileName.toLowerCase().endsWith(".docx")) {
+      await sendWhatsAppMessage(
+        from,
+        "⚠️ Por favor envía un archivo Word (.docx)\n" +
+          "Otros formatos no son compatibles."
+      );
+      return;
+    }
+
+    // Procesar documento
+    const { fileUrl, fileKey, fileBuffer } = await handleDocumentUpload(
+      doc.id,
+      fileName
+    );
+
+    // Obtener nombre del documento si está en flujo de subida
+    const uploadState = uploadService.getState(from);
+    const docName = uploadState?.docName || fileName.replace(".docx", "");
+
+    // Registrar en Andes Docs
+    await registerDocumentInAndesDocs(
+      from,
+      "documento_subido",
+      Date.now().toString(),
+      fileKey,
+      fileUrl,
+      fileBuffer,
+      docName
+    );
+
+    // Limpiar estado de subida si existe
+    uploadService.clearState(from);
+
+    // Preguntar por firma
+    await signatureService.initSignatureFlow(
+      from,
+      fileKey,
+      Date.now().toString(),
+      "documento_subido"
+    );
+  } catch (error) {
+    console.error("Error en handleDocumentMessage:", error);
+
     await sendWhatsAppMessage(
       from,
-      "⚠️ Por favor envía un archivo Word (.docx). " +
-        "Otros formatos no son compatibles."
+      error instanceof Error
+        ? error.message
+        : "❌ Error al procesar el documento. Por favor, inténtalo de nuevo."
     );
-    return;
+
+    // Reintentar flujo de subida si estaba en progreso
+    if (uploadService.getState(from)) {
+      await sendWhatsAppMessage(
+        from,
+        "🔄 Por favor, envía el documento .docx nuevamente"
+      );
+    }
   }
-
-  // Download and upload to S3
-  const { fileUrl, fileKey, fileBuffer } = await handleDocumentUpload(
-    doc.id,
-    fileName
-  );
-
-  const timestamp = Date.now();
-  const documentId = String(timestamp);
-  const documentKind = "documento_subido";
-
-  // Register in Andes Docs
-  await registerDocumentInAndesDocs(
-    from,
-    documentKind,
-    documentId,
-    fileKey,
-    fileUrl,
-    fileBuffer,
-    fileName.replace(".docx", "")
-  );
-
-  // Ask if they want to sign
-  await signatureService.initSignatureFlow(
-    from,
-    fileKey,
-    documentId,
-    documentKind
-  );
 }

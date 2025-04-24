@@ -2,33 +2,47 @@ import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { signatureService } from "./signatureService";
 
 type UploadState = {
-  from: string;
+  from: string; // Campo requerido
   step: number;
   docName?: string;
 };
 
-const uploadStates: Record<string, UploadState> = {};
-
 class UploadService {
+  private uploadStates: Record<string, UploadState> = {};
+
+  getState(from: string): UploadState | undefined {
+    return this.uploadStates[from];
+  }
+
+  clearState(from: string) {
+    delete this.uploadStates[from];
+  }
+
   async initUploadFlow(from: string) {
-    uploadStates[from] = { from, step: 0, docName: undefined };
+    this.clearState(from);
+    this.uploadStates[from] = {
+      from,
+      step: 0,
+    };
+
     await sendWhatsAppMessage(
       from,
-      "Por favor, ingresa el nombre con el que deseas guardar este documento:"
+      "📎 Por favor, ingresa el nombre para el documento:\n" +
+        "(Ej: 'Contrato Arrendamiento Mayo 2025')"
     );
   }
 
   async handleUploadResponse(from: string, text: string): Promise<boolean> {
-    const state = uploadStates[from];
+    const state = this.uploadStates[from];
     if (!state) return false;
 
     if (state.step === 0) {
       const docName = text.trim();
 
-      if (docName.length < 3 || docName.length > 50) {
+      if (docName.length < 3) {
         await sendWhatsAppMessage(
           from,
-          "⚠️ El nombre debe tener entre 3 y 50 caracteres.\n" +
+          "⚠️ El nombre debe tener al menos 3 caracteres\n" +
             "Por favor, ingrésalo nuevamente:"
         );
         return true;
@@ -36,7 +50,16 @@ class UploadService {
 
       state.docName = docName;
       state.step = 1;
-      await sendWhatsAppMessage(from, "📤 Ahora envía el archivo .docx");
+
+      await sendWhatsAppMessage(
+        from,
+        "📤 Ahora por favor envía el archivo .docx\n\n" +
+          "Asegúrate de que:\n" +
+          "• Es un documento Word (.docx)\n" +
+          "• Tiene menos de 5MB\n" +
+          "• Esté correctamente firmado si es necesario"
+      );
+
       return true;
     }
 
@@ -44,14 +67,11 @@ class UploadService {
   }
 
   async handleUploadedDocument(from: string, fileName: string, fileId: string) {
-    const state = uploadStates[from];
-    if (!state.docName) return;
+    const state = this.uploadStates[from];
+    if (!state?.docName) return;
 
     try {
-      // Aquí iría la lógica para manejar el documento subido
-      // Similar a handleDocumentMessage pero usando el nombre proporcionado
-
-      // Después de manejar el documento, preguntar por firma
+      // Lógica para manejar el documento...
       await signatureService.initSignatureFlow(
         from,
         "path/to/uploaded/file",
@@ -59,23 +79,15 @@ class UploadService {
         "documento_subido"
       );
 
-      delete uploadStates[from];
+      delete this.uploadStates[from];
     } catch (error) {
       console.error("Error manejando documento subido:", error);
       await sendWhatsAppMessage(
         from,
         "❌ Hubo un error al procesar tu documento. Por favor, inténtalo de nuevo."
       );
-      delete uploadStates[from];
+      delete this.uploadStates[from];
     }
-  }
-
-  getState(from: string): UploadState | undefined {
-    return uploadStates[from];
-  }
-
-  clearState(from: string) {
-    delete uploadStates[from];
   }
 }
 

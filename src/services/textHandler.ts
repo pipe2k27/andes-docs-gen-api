@@ -1,6 +1,7 @@
 import { signatureService } from "../services/signatureService";
 import { documentService } from "./documentService";
 import { mainMenuService } from "./mainMenuService";
+import { uploadService } from "./uploadService";
 
 export async function handleTextMessage(from: string, text: string) {
   const trimmedText = text.trim();
@@ -14,6 +15,11 @@ export async function handleTextMessage(from: string, text: string) {
   if (
     await documentService.handleDocumentGenerationResponse(from, trimmedText)
   ) {
+    return;
+  }
+
+  // Verificar si está en flujo de subida de documentos
+  if (await uploadService.handleUploadResponse(from, text)) {
     return;
   }
 

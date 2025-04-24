@@ -9,19 +9,27 @@ import {
 import { registerDocumentInAndesDocs } from "./registerDocumentInAndesDocs";
 import { signatureService } from "./signatureService";
 import NumeroALetras from "../utils/generator/numbersToLetters";
+import { Question } from "../types/Questions";
 
 type DocumentGenerationState = {
   step: number;
-  data: any;
+  data: Record<string, any>;
   documentType: string;
   timeout?: NodeJS.Timeout;
 };
 
-const documentGenerations: Record<string, DocumentGenerationState> = {};
-
 class DocumentService {
+  private documentGenerations: Record<string, DocumentGenerationState> = {};
+
+  public clearDocumentGeneration(from: string) {
+    this.clearTimeout(from);
+    delete this.documentGenerations[from];
+  }
+
   async initDocumentGeneration(from: string, documentType: string) {
-    documentGenerations[from] = {
+    this.clearDocumentGeneration(from); // Limpiar estado previo
+
+    this.documentGenerations[from] = {
       step: 0,
       data: {},
       documentType,
@@ -35,84 +43,69 @@ class DocumentService {
     from: string,
     text: string
   ): Promise<boolean> {
-    const generation = documentGenerations[from];
+    const generation = this.documentGenerations[from];
     if (!generation) return false;
 
-    const questions =
-      generation.documentType === "reserva"
-        ? reserva_questions
-        : autorizacion_questions;
-    const currentStep = generation.step;
-    const currentQuestion = questions[currentStep];
+    const questions = this.getQuestionsForType(generation.documentType);
+    const currentQuestion = questions[generation.step];
 
-    // Validate response
-    const validationResult = this.validateResponse(text, currentQuestion);
-    if (validationResult !== true) {
-      await sendWhatsAppMessage(from, validationResult);
+    // Validación mejorada
+    const validation = this.validateResponse(text, currentQuestion);
+    if (validation !== true) {
+      await sendWhatsAppMessage(from, validation);
       return true;
     }
 
-    // Store response
+    // Almacenamiento seguro de la respuesta
     generation.data[currentQuestion.key] = this.formatResponse(
       text,
       currentQuestion
     );
-
-    // Clear timeout and setup new one
     this.clearTimeout(from);
-    this.startTimeout(from);
 
-    // Check if we have more questions
-    if (currentStep < questions.length - 1) {
+    // Avanzar o finalizar
+    if (generation.step < questions.length - 1) {
       generation.step++;
+      this.startTimeout(from);
       await this.sendNextQuestion(from);
-      return true;
+    } else {
+      await this.finalizeDocumentGeneration(from);
     }
 
-    // All questions answered - generate document
-    await this.generateAndRegisterDocument(from);
     return true;
   }
 
-  private async generateAndRegisterDocument(from: string) {
-    const generation = documentGenerations[from];
+  private async finalizeDocumentGeneration(from: string) {
+    const generation = this.documentGenerations[from];
     if (!generation) return;
 
     try {
       const company = getCompanyByPhone(from);
-      if (!company) throw new Error("Empresa no encontrada");
-      if (!company.styles)
-        throw new Error("Estilos no definidos para esta empresa");
-      if (!company.templates.reserva || !company.templates.autorizacion) {
-        throw new Error("Plantillas no definidas para esta empresa");
-      }
+      if (!company) throw new Error("⚠️ Empresa no registrada");
 
-      const template =
-        generation.documentType === "reserva"
-          ? company.templates.reserva
-          : company.templates.autorizacion;
+      // Validación completa de recursos
+      if (!company.styles) throw new Error("❌ Estilos no configurados");
+      const template = this.getDocumentTemplate(
+        company,
+        generation.documentType
+      );
 
-      if (!template)
-        throw new Error(
-          `Plantilla para ${generation.documentType} no encontrada`
-        );
-
+      // Generación del documento
       const docName =
         generation.data.nombreDocumento ||
         `${generation.documentType}_${new Date().toISOString()}`;
 
-      // Generate Word document
       const fileBuffer = await generateAndDownloadWord(
         template,
         generation.data,
         company.styles
       );
 
-      // Upload to S3
+      // Subida a S3
       const fileKey = `${docName}.docx`;
       const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
 
-      // Register in Andes Docs
+      // Registro en Andes Docs
       await registerDocumentInAndesDocs(
         from,
         generation.documentType,
@@ -123,10 +116,7 @@ class DocumentService {
         docName
       );
 
-      // Clean up
-      delete documentGenerations[from];
-
-      // Ask about signing
+      // Iniciar flujo de firma (sin limpiar aún el estado)
       await signatureService.initSignatureFlow(
         from,
         fileKey,
@@ -134,169 +124,125 @@ class DocumentService {
         generation.documentType
       );
     } catch (error) {
-      console.error("Error generando documento:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Ocurrió un error inesperado al generar el documento";
-
-      await sendWhatsAppMessage(from, `❌ ${errorMessage}`);
-      delete documentGenerations[from];
+      console.error("Error en generación de documento:", error);
+      await sendWhatsAppMessage(
+        from,
+        error instanceof Error ? error.message : "❌ Error al generar documento"
+      );
+      this.clearDocumentGeneration(from);
     }
   }
 
-  // Helper methods...
-  private validateResponse(text: string, question: any): string | true {
+  // Helper methods
+  private getQuestionsForType(documentType: string) {
+    return documentType === "reserva"
+      ? reserva_questions
+      : autorizacion_questions;
+  }
+
+  private getDocumentTemplate(company: any, documentType: string) {
+    const template =
+      documentType === "reserva"
+        ? company.templates.reserva
+        : company.templates.autorizacion;
+
+    if (!template)
+      throw new Error(`Plantilla para ${documentType} no configurada`);
+    return template;
+  }
+
+  private validateResponse(text: string, question: Question): string | true {
     const trimmedText = text.trim();
 
-    // Opción especial "9" para respuestas pendientes
-    if (!question.options && trimmedText === "9") {
-      return true;
+    // Opción 9 para campos sin opciones
+    if (!question.options && trimmedText === "9") return true;
+
+    // Validación numérica estricta
+    if (question.format?.includes("number")) {
+      if (!/^\d+$/.test(trimmedText)) {
+        return "🔢 Solo se permiten números enteros (ej: 150000)\nEscribe 9 si no tienes el dato";
+      }
     }
 
-    // Validación para campos numéricos
+    // Validación para opciones predefinidas
     if (
-      question.format === "number" ||
-      question.format === "numberAndLetters"
+      question.options &&
+      !question.options.some((opt) => opt.value === trimmedText)
     ) {
-      // Eliminar todos los caracteres no numéricos
-      const numericValue = trimmedText.replace(/[^0-9]/g, "");
-
-      // Validar que el resultado no esté vacío
-      if (numericValue === "") {
-        return "🔢 Esperamos un valor numérico. Solo escribe el número sin puntos, comas o letras.";
-      }
-
-      // Validar que el texto original solo contenía números
-      if (/[^0-9]/.test(trimmedText)) {
-        return "⚠️ Formato incorrecto. Por favor escribe solo el número (ej: 1500) sin puntos, comas o letras.";
-      }
+      const optionsText = question.options
+        .map((opt) => `${opt.value}. ${opt.label}`)
+        .join("\n");
+      return `❌ Selecciona una opción válida:\n${optionsText}`;
     }
 
-    // Validación para respuestas vacías (excepto cuando hay opciones)
-    if (!trimmedText && !question.options) {
-      return "❌ Por favor, ingresa una respuesta válida o escribe '9' si aún no tienes la información.";
-    }
-
-    // Validación para opciones con valores predefinidos
-    if (question.options) {
-      const validOptions = question.options.map((opt: any) => opt.value);
-      if (!validOptions.includes(trimmedText)) {
-        return `❌ Opción no válida. Por favor elige entre: ${validOptions.join(
-          ", "
-        )}`;
-      }
-    }
-
-    // Validación para formatos específicos
-    if (question.format === "number") {
-      if (isNaN(Number(trimmedText))) {
-        return "❌ Por favor, ingresa solo números.";
-      }
-    }
-
-    if (question.format === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(trimmedText)) {
-        return "❌ Por favor, ingresa un correo electrónico válido.";
-      }
-    }
-
-    // Si pasa todas las validaciones
     return true;
   }
 
-  private formatResponse(text: string, question: any): any {
+  private formatResponse(text: string, question: Question): any {
     const trimmedText = text.trim();
 
-    // Manejar opción "9" para campos sin opciones predefinidas
-    if (!question.options && trimmedText === "9") {
-      return "__________"; // Guiones bajos para campos pendientes
-    }
-
-    // Formateo para números
-    if (question.format === "number") {
-      return Number(trimmedText);
-    }
-
-    // Formateo para números con letras
+    if (trimmedText === "9") return "__________";
+    if (question.options)
+      return (
+        question.options.find((opt) => opt.value === trimmedText)?.label || text
+      );
+    if (question.format === "number") return Number(trimmedText);
     if (question.format === "numberAndLetters") {
       const number = Number(trimmedText);
-      const inWords = NumeroALetras(number).toUpperCase();
-      return `${number} (${inWords})`;
+      return `${number} (${NumeroALetras(number).toUpperCase()})`;
     }
 
-    // Formateo para opciones predefinidas
-    if (question.options) {
-      const selectedOption = question.options.find(
-        (opt: any) => opt.value === trimmedText
-      );
-      return selectedOption?.label || trimmedText;
-    }
-
-    // Formateo para números
-    if (question.format === "number") {
-      return Number(trimmedText);
-    }
-
-    // Por defecto, devolver el texto formateado
     return trimmedText;
   }
 
   private async sendNextQuestion(from: string) {
-    const generation = documentGenerations[from];
-    const questions =
-      generation.documentType === "reserva"
-        ? reserva_questions
-        : autorizacion_questions;
-    const nextQuestion = questions[generation.step];
+    const generation = this.documentGenerations[from];
+    if (!generation) return;
 
-    let message = nextQuestion.question;
+    const questions = this.getQuestionsForType(generation.documentType);
+    const question = questions[generation.step];
 
-    // Solo agregar opción "9" si no es una pregunta con opciones predefinidas
-    if (!nextQuestion.options) {
-      message += "\n\nEscribe *9* si aún no tienes esta información";
+    let message = question.question;
+    if (!question.options) {
+      message += "\n\nEscribe *9* si no tienes esta información";
     } else {
       message +=
         "\n\n" +
-        nextQuestion.options
-          .map((opt) => `${opt.value}. ${opt.label}`)
-          .join("\n");
+        question.options.map((opt) => `${opt.value}. ${opt.label}`).join("\n");
     }
 
     await sendWhatsAppMessage(from, message);
   }
 
   private startTimeout(from: string) {
-    if (!documentGenerations[from]) return;
+    this.clearTimeout(from);
 
-    documentGenerations[from].timeout = setTimeout(async () => {
-      console.log(
-        `⏳ Recordatorio enviado a ${from} (2 minutos sin respuesta)`
-      );
+    const generation = this.documentGenerations[from];
+    if (!generation) return;
+
+    generation.timeout = setTimeout(async () => {
+      if (!this.documentGenerations[from]) return;
 
       await sendWhatsAppMessage(
         from,
-        "¿Sigues ahí? Por favor responde para continuar."
+        "⏳ ¿Sigues ahí? Responde para continuar..."
       );
 
-      // Segundo timeout para finalizar la conversación
-      documentGenerations[from].timeout = setTimeout(async () => {
-        console.log(`⌛ Conversación cerrada por inactividad (${from})`);
-
+      generation.timeout = setTimeout(async () => {
         await sendWhatsAppMessage(
           from,
-          "⏱️ Hemos finalizado la conversación por inactividad. Puedes comenzar de nuevo cuando lo desees."
+          "⌛️ Conversación finalizada por inactividad"
         );
-        delete documentGenerations[from];
+        this.clearDocumentGeneration(from);
       }, 120000); // 2 minutos adicionales
     }, 120000); // 2 minutos iniciales
   }
 
   private clearTimeout(from: string) {
-    if (documentGenerations[from]?.timeout) {
-      clearTimeout(documentGenerations[from].timeout);
-      delete documentGenerations[from].timeout;
+    const generation = this.documentGenerations[from];
+    if (generation?.timeout) {
+      clearTimeout(generation.timeout);
+      delete generation.timeout;
     }
   }
 }

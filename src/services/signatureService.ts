@@ -1,5 +1,6 @@
 import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { sendToSignDocumentWithAndesDocs } from "../utils/andes-api";
+import { documentService } from "./documentService";
 
 type SignatureState = {
   from: string;
@@ -126,7 +127,14 @@ class SignatureService {
 
   private async sendForSignature(from: string) {
     const state = signatureStates[from];
+    if (!state) return;
+
     try {
+      // 1. Validar que tenemos todos los datos necesarios
+      if (!state.filePath || !state.documentId || state.signers.length === 0) {
+        throw new Error("Faltan datos para enviar a firma");
+      }
+
       await sendToSignDocumentWithAndesDocs({
         phoneNumber: state.from,
         documentId: state.documentId,
@@ -138,7 +146,8 @@ class SignatureService {
 
       await sendWhatsAppMessage(
         from,
-        "✅ El documento ha sido enviado para firma electrónica."
+        "✅ Documento enviado para firma electrónica correctamente. " +
+          "Los firmantes recibirán un email con las instrucciones."
       );
     } catch (error) {
       console.error("Error enviando a firmar:", error);
@@ -148,6 +157,12 @@ class SignatureService {
       );
     } finally {
       delete signatureStates[from];
+      documentService.clearDocumentGeneration(from);
+
+      await sendWhatsAppMessage(
+        from,
+        "🔹 Conversación finalizada. Escribe *menu* para comenzar una nueva operación."
+      );
     }
   }
 }

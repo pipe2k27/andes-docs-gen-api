@@ -8,6 +8,7 @@ import {
 } from "../common/whatsapp-questions";
 import { registerDocumentInAndesDocs } from "./registerDocumentInAndesDocs";
 import { signatureService } from "./signatureService";
+import NumeroALetras from "../utils/generator/numbersToLetters";
 
 type DocumentGenerationState = {
   step: number;
@@ -148,9 +149,33 @@ class DocumentService {
   private validateResponse(text: string, question: any): string | true {
     const trimmedText = text.trim();
 
-    // Validación básica para respuestas vacías
-    if (!trimmedText) {
-      return "❌ Por favor, ingresa una respuesta válida.";
+    // Opción especial "9" para respuestas pendientes
+    if (!question.options && trimmedText === "9") {
+      return true;
+    }
+
+    // Validación para campos numéricos
+    if (
+      question.format === "number" ||
+      question.format === "numberAndLetters"
+    ) {
+      // Eliminar todos los caracteres no numéricos
+      const numericValue = trimmedText.replace(/[^0-9]/g, "");
+
+      // Validar que el resultado no esté vacío
+      if (numericValue === "") {
+        return "🔢 Esperamos un valor numérico. Solo escribe el número sin puntos, comas o letras.";
+      }
+
+      // Validar que el texto original solo contenía números
+      if (/[^0-9]/.test(trimmedText)) {
+        return "⚠️ Formato incorrecto. Por favor escribe solo el número (ej: 1500) sin puntos, comas o letras.";
+      }
+    }
+
+    // Validación para respuestas vacías (excepto cuando hay opciones)
+    if (!trimmedText && !question.options) {
+      return "❌ Por favor, ingresa una respuesta válida o escribe '9' si aún no tienes la información.";
     }
 
     // Validación para opciones con valores predefinidos
@@ -184,6 +209,23 @@ class DocumentService {
   private formatResponse(text: string, question: any): any {
     const trimmedText = text.trim();
 
+    // Manejar opción "9" para campos sin opciones predefinidas
+    if (!question.options && trimmedText === "9") {
+      return "__________"; // Guiones bajos para campos pendientes
+    }
+
+    // Formateo para números
+    if (question.format === "number") {
+      return Number(trimmedText);
+    }
+
+    // Formateo para números con letras
+    if (question.format === "numberAndLetters") {
+      const number = Number(trimmedText);
+      const inWords = NumeroALetras(number).toUpperCase();
+      return `${number} (${inWords})`;
+    }
+
     // Formateo para opciones predefinidas
     if (question.options) {
       const selectedOption = question.options.find(
@@ -210,7 +252,11 @@ class DocumentService {
     const nextQuestion = questions[generation.step];
 
     let message = nextQuestion.question;
-    if (nextQuestion.options) {
+
+    // Solo agregar opción "9" si no es una pregunta con opciones predefinidas
+    if (!nextQuestion.options) {
+      message += "\n\nEscribe *9* si aún no tienes esta información";
+    } else {
       message +=
         "\n\n" +
         nextQuestion.options
@@ -225,6 +271,10 @@ class DocumentService {
     if (!documentGenerations[from]) return;
 
     documentGenerations[from].timeout = setTimeout(async () => {
+      console.log(
+        `⏳ Recordatorio enviado a ${from} (2 minutos sin respuesta)`
+      );
+
       await sendWhatsAppMessage(
         from,
         "¿Sigues ahí? Por favor responde para continuar."
@@ -232,9 +282,11 @@ class DocumentService {
 
       // Segundo timeout para finalizar la conversación
       documentGenerations[from].timeout = setTimeout(async () => {
+        console.log(`⌛ Conversación cerrada por inactividad (${from})`);
+
         await sendWhatsAppMessage(
           from,
-          "Hemos finalizado la conversación por inactividad. Puedes comenzar de nuevo cuando lo desees."
+          "⏱️ Hemos finalizado la conversación por inactividad. Puedes comenzar de nuevo cuando lo desees."
         );
         delete documentGenerations[from];
       }, 120000); // 2 minutos adicionales

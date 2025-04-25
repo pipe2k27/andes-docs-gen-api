@@ -1,3 +1,4 @@
+import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { signatureService } from "../services/signatureService";
 import { documentService } from "./documentService";
 import { mainMenuService } from "./mainMenuService";
@@ -18,8 +19,11 @@ export async function handleTextMessage(from: string, text: string) {
     return;
   }
 
-  // Verificar si está en flujo de subida de documentos
-  if (await uploadService.handleUploadResponse(from, text)) {
+  if (uploadService.isUploadInProgress(from)) {
+    await sendWhatsAppMessage(
+      from,
+      "⚠️ Estamos esperando tu documento .docx. Por favor envíalo ahora o cancela el proceso."
+    );
     return;
   }
 

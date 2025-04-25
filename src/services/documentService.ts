@@ -172,7 +172,7 @@ class DocumentService {
       const optionsText = question.options
         .map((opt) => `${opt.value}. ${opt.label}`)
         .join("\n");
-      return `❌ Selecciona una opción válida:\n${optionsText}`;
+      return `❌ Escribe solo el número de la opción:\n${optionsText}`;
     }
 
     return true;

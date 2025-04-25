@@ -35,8 +35,13 @@ export async function handleDocumentMessage(from: string, message: any) {
       docName
     );
 
-    // Complete the upload process
-    uploadService.completeUpload(from);
+    // Send success message with document URL
+    await sendWhatsAppMessage(
+      from,
+      `✅ El documento se generó y subió a Andes Docs correctamente!\n\n` +
+        `Podes descargarlo, editarlo o simplemente verlo, también podes trabajar con él en la plataforma oficial.\n\n` +
+        `Te comparto el link: ${fileUrl}`
+    );
 
     // Ask about signature
     await signatureService.initSignatureFlow(
@@ -45,6 +50,9 @@ export async function handleDocumentMessage(from: string, message: any) {
       Date.now().toString(),
       "documento_subido"
     );
+
+    // Complete the upload process
+    uploadService.completeUpload(from);
   } catch (error) {
     console.error("Error en handleDocumentMessage:", error);
     await sendWhatsAppMessage(

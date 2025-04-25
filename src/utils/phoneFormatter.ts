@@ -3,23 +3,16 @@ export const formatPhoneNumber = (phone: string): string => {
   // Remove all non-digit characters
   let cleaned = phone.replace(/\D/g, "");
 
-  // Handle Argentine numbers
+  // Handle WhatsApp's format (5491122775850 → 5411522775850)
   if (cleaned.startsWith("549")) {
-    // Mobile format
-    return cleaned;
-  }
-  if (cleaned.startsWith("54")) {
-    // Country code only
-    return cleaned;
-  }
-  if (cleaned.startsWith("9")) {
-    // Local mobile
-    return `54${cleaned}`;
-  }
-  if (cleaned.startsWith("11") && cleaned.length === 10) {
-    // Buenos Aires landline
-    return `54${cleaned}`;
+    return `54${cleaned.substring(3)}`; // Remove the 9, keep country code
   }
 
-  return cleaned; // Return cleaned number without + prefix
+  // Handle already correct format
+  if (cleaned.startsWith("5411")) {
+    return cleaned;
+  }
+
+  // Default case
+  return `5411${cleaned.slice(-8)}`; // Force BA area code + last 8 digits
 };

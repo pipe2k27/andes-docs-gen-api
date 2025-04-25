@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { Company } from "../models/Company";
 import { companies } from "../config/db";
 import { sendWhatsAppMessage } from "../controllers/whatsappController";
+import { formatPhoneNumber } from "../utils/phoneFormatter";
 
 export const validatePhoneMiddleware = async (
   req: Request,
@@ -22,9 +23,14 @@ export const validatePhoneMiddleware = async (
 
   console.log(`📞 Número recibido en el webhook: ${from}`);
 
+  // Format number for comparison
+  const formattedFrom = formatPhoneNumber(from);
+
   // Buscar si el número pertenece a alguna empresa autorizada
   const isAuthorized = companies.some((company: Company) =>
-    company.whatsappNumbers.includes(from)
+    company.whatsappNumbers.some(
+      (companyNumber) => formatPhoneNumber(companyNumber) === formattedFrom
+    )
   );
 
   if (!isAuthorized) {

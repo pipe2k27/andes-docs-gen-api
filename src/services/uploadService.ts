@@ -2,7 +2,7 @@ import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { signatureService } from "./signatureService";
 
 type UploadState = {
-  from: string; // Campo requerido
+  from: string;
   step: number;
   docName?: string;
 };
@@ -24,12 +24,6 @@ class UploadService {
       from,
       step: 0,
     };
-
-    await sendWhatsAppMessage(
-      from,
-      "📎 Por favor, ingresa el nombre para el documento:\n" +
-        "(Ej: 'Contrato Arrendamiento Mayo 2025')"
-    );
   }
 
   async handleUploadResponse(from: string, text: string): Promise<boolean> {

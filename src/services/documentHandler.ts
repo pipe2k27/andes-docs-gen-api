@@ -7,7 +7,7 @@ import { uploadService } from "./uploadService";
 export async function handleDocumentMessage(from: string, message: any) {
   try {
     const doc = message.document;
-    const fileName = doc.filename || "documento.docx";
+    const fileName = doc.filename;
 
     // 1. Validate file type
     if (!fileName.toLowerCase().endsWith(".docx")) {
@@ -40,7 +40,7 @@ export async function handleDocumentMessage(from: string, message: any) {
     try {
       await registerDocumentInAndesDocs(
         from,
-        "documento_subido",
+        "Whatsapp Document",
         Date.now().toString(),
         fileKey,
         fileUrl,
@@ -63,7 +63,7 @@ export async function handleDocumentMessage(from: string, message: any) {
         from,
         fileKey,
         Date.now().toString(),
-        "documento_subido"
+        "Whatsapp Document"
       );
     } catch (signatureError) {
       console.error("Error initiating signature flow:", signatureError);

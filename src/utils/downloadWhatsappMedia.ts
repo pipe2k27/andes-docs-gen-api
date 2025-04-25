@@ -41,7 +41,7 @@ export const handleDocumentUpload = async (
     }
 
     // 4. Subir a S3
-    const fileKey = `uploads/${Date.now()}-${fileName.replace(/[^\w.-]/g, "")}`;
+    const fileKey = `uploads/${fileName}.docx`;
     const fileBuffer = Buffer.from(fileRes.data);
 
     const s3Url = await s3StoreFile("wa-generation", fileKey, fileBuffer);

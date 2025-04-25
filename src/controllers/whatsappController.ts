@@ -1,5 +1,6 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import { formatPhoneNumber } from "../utils/phoneFormatter";
 
 dotenv.config();
 
@@ -9,12 +10,14 @@ const ACCESS_TOKEN = process.env.WHATS_VERIFY_TOKEN;
 
 export const sendWhatsAppMessage = async (to: string, text: string) => {
   try {
+    const formattedTo = formatPhoneNumber(to);
+
     const response = await axios.post(
       `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
       {
         messaging_product: "whatsapp",
         // to: "54111522775850",
-        to,
+        to: formattedTo,
         type: "text",
         text: { body: text },
       },
@@ -26,13 +29,13 @@ export const sendWhatsAppMessage = async (to: string, text: string) => {
       }
     );
 
-    console.log("📤 Mensaje enviado:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error(
-      "❌ Error al enviar mensaje:",
-      error.response?.data || error.message
-    );
-    throw new Error(error.response?.data || error.message);
+    if (error.response?.data?.error?.code === 131030) {
+      console.error(
+        `❌ Number ${to} not in allowed list. Add it to Meta's dashboard.`
+      );
+    }
+    throw error;
   }
 };

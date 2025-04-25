@@ -40,10 +40,20 @@ export const handleDocumentUpload = async (
       throw new Error("Solo se permiten archivos .docx");
     }
 
-    // 4. Subir a S3
-    const fileKey = `uploads/${fileName}.docx`;
-    const fileBuffer = Buffer.from(fileRes.data);
+    if (fileName.length > 100) {
+      throw new Error("El nombre del archivo es demasiado largo");
+    }
 
+    // 4. Subir a S3
+    const cleanFileName = fileName
+      .replace(/[^\w.-]/g, "") // Remove special characters
+      .replace(/\.docx$/i, "") // Remove existing .docx if present
+      .trim();
+
+    const finalFileName = `${cleanFileName}.docx`;
+    const fileKey = `uploads/${finalFileName}`;
+
+    const fileBuffer = Buffer.from(fileRes.data);
     const s3Url = await s3StoreFile("wa-generation", fileKey, fileBuffer);
 
     return {

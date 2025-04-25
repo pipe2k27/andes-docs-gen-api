@@ -13,7 +13,8 @@ export const sendWhatsAppMessage = async (to: string, text: string) => {
       `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
       {
         messaging_product: "whatsapp",
-        to: "54111522775850",
+        // to: "54111522775850",
+        to,
         type: "text",
         text: { body: text },
       },

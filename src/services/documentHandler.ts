@@ -35,14 +35,6 @@ export async function handleDocumentMessage(from: string, message: any) {
       docName
     );
 
-    // Send success message with document URL
-    await sendWhatsAppMessage(
-      from,
-      `✅ El documento se generó y subió a Andes Docs correctamente!\n\n` +
-        `Podes descargarlo, editarlo o simplemente verlo, también podes trabajar con él en la plataforma oficial.\n\n` +
-        `Te comparto el link: ${fileUrl}`
-    );
-
     // Ask about signature
     await signatureService.initSignatureFlow(
       from,

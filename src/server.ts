@@ -21,13 +21,13 @@ app.get("/", (req, res) => {
   res.send("¡Bienvenido a la API de Andes Docs!");
 });
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // Fabian Achaval API REST Documentation
 
-app.use("/FA", apiRoutes);
+app.use("/FA", apiRoutes); // Fabian Achaval API
 
-app.use(logRoutes);
+app.use(logRoutes); // Logger for Fabian Achaval API
 
-app.use("/webhook", whatsappWebhookRoute);
+app.use("/webhook", whatsappWebhookRoute); // Webhook for Andes Docs WhatsApp Bot
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

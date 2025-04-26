@@ -51,7 +51,7 @@ export const handleDocumentUpload = async (
       .trim();
 
     const finalFileName = `${cleanFileName}.docx`;
-    const fileKey = `uploads/${finalFileName}`;
+    const fileKey = `${finalFileName}`;
 
     const fileBuffer = Buffer.from(fileRes.data);
     const s3Url = await s3StoreFile("wa-generation", fileKey, fileBuffer);

@@ -45,12 +45,8 @@ export const handleDocumentUpload = async (
     }
 
     // 4. Subir a S3
-    const cleanFileName = fileName
-      .replace(/[^\w.-]/g, "") // Remove special characters
-      .replace(/\.docx$/i, "") // Remove existing .docx if present
-      .trim();
 
-    const finalFileName = `${cleanFileName}.docx`;
+    const finalFileName = `${fileName}.docx`;
     const fileKey = `${finalFileName}`;
 
     const fileBuffer = Buffer.from(fileRes.data);

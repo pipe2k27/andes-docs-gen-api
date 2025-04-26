@@ -10,8 +10,8 @@ export const companies: Company[] = [
     whatsappNumbers: [
       "54111522775850",
       "5491122775850",
-      "5491131073107",
       "54111531073107",
+      "5491131073107",
     ],
     styles: styles_andes,
     templates: {

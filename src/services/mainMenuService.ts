@@ -35,7 +35,7 @@ class MainMenuService {
     );
     await sendWhatsAppMessage(
       from,
-      "¿Qué documento necesitas gestionar hoy?\n\n1. Generar Reserva\n2. Generar Autorización\n3. Enviar documento a firmar\n\n0. Reiniciar el proceso"
+      "¿Qué documento necesitas gestionar hoy?\n\n1. Generar Reserva\n2. Generar Autorización\n3. Enviar documento a firmar\n"
     );
   }
 

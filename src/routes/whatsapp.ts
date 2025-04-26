@@ -28,11 +28,6 @@ router.post("/", validatePhoneMiddleware, async (req, res) => {
 
     // Structured logging of the relevant message data
     console.log("📩 WhatsApp Message Received:", {
-      metadata: {
-        phoneNumberId: changes?.value?.metadata?.phone_number_id,
-        displayNumber: changes?.value?.metadata?.display_phone_number,
-        timestamp: new Date().toISOString(),
-      },
       contact: {
         waId: changes?.value?.contacts?.[0]?.wa_id,
         profileName: changes?.value?.contacts?.[0]?.profile?.name,

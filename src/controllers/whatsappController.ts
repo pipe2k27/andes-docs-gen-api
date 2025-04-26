@@ -29,7 +29,10 @@ export const sendWhatsAppMessage = async (to: string, text: string) => {
       }
     );
 
-    console.log("📤 Mensaje enviado:", response.data);
+    console.log(
+      "📤 Message send from Andi Bot to:",
+      response.data.contacts[0].wa_id
+    );
     return response.data;
   } catch (error: any) {
     console.error(

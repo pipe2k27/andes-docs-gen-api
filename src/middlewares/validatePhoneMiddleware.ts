@@ -21,8 +21,6 @@ export const validatePhoneMiddleware = async (
 
   const from = message.from;
 
-  console.log(`📞 Número recibido en el webhook: ${from}`);
-
   // Format number for comparison
   const formattedFrom = formatPhoneNumber(from);
 

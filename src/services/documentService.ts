@@ -162,17 +162,26 @@ class DocumentService {
   private validateResponse(text: string, question: Question): string | true {
     const trimmedText = text.trim();
 
-    // Opción 9 para campos sin opciones
+    // Special handling for the document name question
+    if (question.key === "nombreDocumento") {
+      if (trimmedText === "9") {
+        return "❌ Por favor ingresa un nombre descriptivo para el documento (Ej: Reserva Casa Caballito, Autorización Depto CABA)";
+      }
+      if (trimmedText.length === 0) {
+        return "❌ El nombre del documento no puede estar vacío";
+      }
+      return true;
+    }
+
+    // Original validation for other questions
     if (!question.options && trimmedText === "9") return true;
 
-    // Validación numérica estricta
     if (question.format?.includes("number")) {
       if (!/^\d+$/.test(trimmedText)) {
         return "🔢 Solo se permiten números enteros (ej: 150000)\nEscribe 9 si no tienes el dato";
       }
     }
 
-    // Validación para opciones predefinidas
     if (
       question.options &&
       !question.options.some((opt) => opt.value === trimmedText)
@@ -211,7 +220,14 @@ class DocumentService {
     const question = questions[generation.step];
 
     let message = question.question;
-    if (!question.options) {
+
+    // Special handling for document name question
+    if (question.key === "nombreDocumento") {
+      message +=
+        "\n\nPor favor ingresa un nombre descriptivo para el documento";
+    }
+    // Original handling for other questions
+    else if (!question.options) {
       message += "\n\nEscribe *9* si no tienes esta información";
     } else {
       message +=

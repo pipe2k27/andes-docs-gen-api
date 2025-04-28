@@ -16,7 +16,6 @@ export async function handleIncomingMessage(from: string, message: any) {
     }
 
     // Unsupported message type
-    console.log(`⚠️ Tipo de mensaje no soportado: ${message.type}`);
     await sendWhatsAppMessage(
       from,
       "Lo siento, solo puedo procesar mensajes de texto o documentos .docx"

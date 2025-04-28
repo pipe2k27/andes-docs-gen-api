@@ -50,8 +50,7 @@ router.post("/", validatePhoneMiddleware, async (req, res) => {
     const from = message?.from;
 
     if (!message) {
-      console.log("🔍 No se encontró un mensaje en la solicitud.");
-      res.sendStatus(400);
+      res.sendStatus(400).json({ error: "Message is not received on request" });
     }
 
     await handleIncomingMessage(from, message);

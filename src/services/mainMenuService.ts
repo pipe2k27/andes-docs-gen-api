@@ -29,9 +29,10 @@ class MainMenuService {
   }
 
   async sendWelcomeMessage(from: string) {
+    await sendWhatsAppMessage(from, "*¡Hola! Mi nombre es Andy 🤖!*");
     await sendWhatsAppMessage(
       from,
-      "*¡Hola! Gracias por trabajar con Andes Docs🏔️⚡!*"
+      "*Gracias por trabajar con Andes Docs🏔️⚡!*"
     );
     await sendWhatsAppMessage(
       from,

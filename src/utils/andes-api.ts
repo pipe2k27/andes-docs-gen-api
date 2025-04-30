@@ -56,8 +56,6 @@ export const sendToSignDocumentWithAndesDocs = async (
       }
     );
 
-    console.log("data response:", response.data);
-
     return {
       success: true,
       data: response.data,

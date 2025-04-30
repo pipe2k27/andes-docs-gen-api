@@ -113,7 +113,8 @@ class DocumentService {
         fileKey,
         fileUrl,
         fileBuffer,
-        docName
+        docName,
+        "docx"
       );
 
       // Send success message with document URL

@@ -186,7 +186,7 @@ class SignatureService {
         throw new Error("Faltan datos para enviar a firma");
       }
 
-      await sendToSignDocumentWithAndesDocs({
+      const response = await sendToSignDocumentWithAndesDocs({
         phoneNumber: state.from,
         documentId: state.documentId,
         documentKind:
@@ -195,11 +195,34 @@ class SignatureService {
         signers: state.signers,
       });
 
+      // Mensaje inicial de confirmación
       await sendWhatsAppMessage(
         from,
-        "📨 *Documento enviado para firma electrónica*\n\n" +
-          "Los firmantes recibirán un email con las instrucciones para firmar.\n\n" +
-          "Puede verificar el estado en la plataforma de Andes Docs."
+        "✅ *Documento enviado para firma electrónica correctamente*"
+      );
+
+      // Enviamos los links de cada firmante en mensajes separados
+      if (response?.success && response.data?.data) {
+        for (const signerData of response.data.data) {
+          const signerIndex = response.data.data.indexOf(signerData);
+          const signerName =
+            state.signers[signerIndex]?.name || `Firmante ${signerIndex + 1}`;
+
+          await sendWhatsAppMessage(
+            from,
+            `🔗 Link para ${signerName}:\n${signerData.sign_url}`
+          );
+
+          // Pequeña pausa para evitar problemas con WhatsApp
+          await new Promise((resolve) => setTimeout(resolve, 300));
+        }
+      }
+
+      // Mensaje final
+      await sendWhatsAppMessage(
+        from,
+        "📩 Los firmantes también recibirán un email con el link para firmar.\n\n" +
+          "Puedes verificar el estado en cualquier momento en Andes Docs."
       );
     } catch (error) {
       console.error("Error enviando a firmar:", error);

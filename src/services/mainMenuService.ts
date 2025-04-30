@@ -29,14 +29,14 @@ class MainMenuService {
   }
 
   async sendWelcomeMessage(from: string) {
-    await sendWhatsAppMessage(from, "*¡Hola! Mi nombre es Andy 🤖!*");
+    await sendWhatsAppMessage(from, "*¡Hola! Mi nombre es Andy 🤖*");
     await sendWhatsAppMessage(
       from,
-      "*Gracias por trabajar con Andes Docs🏔️⚡!*"
+      "*Gracias por trabajar con Andes Docs 🏔️⚡*"
     );
     await sendWhatsAppMessage(
       from,
-      "¿Qué documento necesitas gestionar hoy?\n\n1. Generar Reserva\n2. Generar Autorización\n3. Enviar documento a firmar\n"
+      "¿Qué documento necesitas gestionar hoy?\n\n1. Generar Reserva\n2. Generar Autorización (Beta)\n3. Enviar documento a firmar\n"
     );
   }
 

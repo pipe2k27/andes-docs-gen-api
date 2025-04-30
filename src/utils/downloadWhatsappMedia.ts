@@ -35,19 +35,22 @@ export const handleDocumentUpload = async (
       throw new Error(`Error ${fileRes.status} al descargar archivo`);
     }
 
-    // 3. Validar tipo de archivo
-    if (!fileName.toLowerCase().endsWith(".docx")) {
-      throw new Error("Solo se permiten archivos .docx");
+    // 3. Validar tipo de archivo (ahora acepta PDF y DOCX)
+    const fileExt = fileName.toLowerCase().split(".").pop();
+    if (fileExt !== "docx" && fileExt !== "pdf") {
+      throw new Error("Solo se permiten archivos .docx o .pdf");
     }
 
     if (fileName.length > 100) {
-      throw new Error("El nombre del archivo es demasiado largo");
+      throw new Error(
+        "El nombre del archivo es demasiado largo (máx. 100 caracteres)"
+      );
     }
 
-    // 4. Subir a S3
-
-    const finalFileName = `${fileName}.docx`;
-    const fileKey = `${finalFileName}`;
+    // 4. Subir a S3 manteniendo la extensión original
+    const fileKey = fileName.endsWith(`.${fileExt}`)
+      ? fileName
+      : `${fileName}.${fileExt}`;
 
     const fileBuffer = Buffer.from(fileRes.data);
     const s3Url = await s3StoreFile("wa-generation", fileKey, fileBuffer);
@@ -69,6 +72,8 @@ export const handleDocumentUpload = async (
         errorMessage =
           "Tiempo de espera agotado. Por favor, intenta enviar el documento nuevamente.";
       }
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
     }
 
     throw new Error(errorMessage);

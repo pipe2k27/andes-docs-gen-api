@@ -36,7 +36,7 @@ class SignatureService {
 
     await sendWhatsAppMessage(
       from,
-      "¿Desea enviar a *firmar* el documento generado?\n\n1. Sí\n2. No"
+      "¿Desea enviar a *firmar* el documento?\n\n1. Sí\n2. No"
     );
   }
 

@@ -7,13 +7,16 @@ import { uploadService } from "./uploadService";
 export async function handleDocumentMessage(from: string, message: any) {
   try {
     const doc = message.document;
-    const fileName = doc.filename || "documento.docx";
+    const fileName = doc.filename || "documento.pdf";
+    const fileExt = fileName.split(".").pop()?.toLowerCase();
 
-    // Validate file type
-    if (!fileName.toLowerCase().endsWith(".docx")) {
+    // Validate extention
+    if (fileExt !== "pdf" && fileExt !== "docx") {
       await sendWhatsAppMessage(
         from,
-        "⚠️ Por favor envía un archivo Word (.docx)\n" +
+        "⚠️ Por favor envía un archivo en formato:\n" +
+          "• Word (.docx)\n" +
+          "• PDF (.pdf)\n\n" +
           "Otros formatos no son compatibles."
       );
       return;
@@ -24,7 +27,7 @@ export async function handleDocumentMessage(from: string, message: any) {
     const { fileUrl, fileKey, fileBuffer } = uploadResult;
 
     // Register in Andes Docs using the filename (without .docx) as docName
-    const docName = fileName.replace(/\.docx$/i, "");
+    const docName = fileName.replace(/\.[^/.]+$/, "");
     await registerDocumentInAndesDocs(
       from,
       "documento_subido",
@@ -32,7 +35,8 @@ export async function handleDocumentMessage(from: string, message: any) {
       fileKey,
       fileUrl,
       fileBuffer,
-      docName
+      docName,
+      fileExt
     );
 
     // Ask about signature
@@ -57,7 +61,7 @@ export async function handleDocumentMessage(from: string, message: any) {
     if (uploadService.isUploadInProgress(from)) {
       await sendWhatsAppMessage(
         from,
-        "🔄 Por favor, envía el documento .docx nuevamente"
+        "🔄 Por favor, envía el documento nuevamente (formato .docx o .pdf)"
       );
     }
   }

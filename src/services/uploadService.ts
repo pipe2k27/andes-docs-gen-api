@@ -17,12 +17,19 @@ class UploadService {
 
   async initUploadFlow(from: string) {
     this.startUpload(from);
+
     await sendWhatsAppMessage(
       from,
-      "📤 Por favor envía el archivo .docx\n\n" +
+      "Primero vamos a subir el documento a *Andes Docs*:"
+    );
+    await sendWhatsAppMessage(
+      from,
+      "📤 Por favor envía el archivo\n\n" +
         "Asegúrate de que:\n" +
-        "• Es un documento Word (.docx)\n" +
-        "• Tiene menos de 5MB\n"
+        "• Word (.docx)\n" +
+        "• PDF (.pdf)\n\n" +
+        "Requisitos:\n" +
+        "• Tamaño máximo: 10MB\n"
     );
   }
 }

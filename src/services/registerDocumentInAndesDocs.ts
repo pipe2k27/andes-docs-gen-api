@@ -8,7 +8,8 @@ export const registerDocumentInAndesDocs = async (
   fileKey: string,
   fileUrl: string,
   fileBuffer: Buffer,
-  docName: string
+  docName: string,
+  fileExtension: string
 ) => {
   console.log(`📩 Iniciando registro en Andes Docs para ${from}`);
 
@@ -22,22 +23,31 @@ export const registerDocumentInAndesDocs = async (
     }
 
     const now = Date.now();
-    const fileName = fileKey.replace(".docx", "");
+    const fileName = fileKey.replace(/\.[^/.]+$/, "");
+
+    let andesDocType, andesFormat;
+    if (fileExtension === "pdf") {
+      andesDocType = "PDF";
+      andesFormat = "pdf";
+    } else {
+      andesDocType = "Word";
+      andesFormat = "word";
+    }
 
     const docData = {
       companyId: company.companyId,
       companyName: company.companyName,
       phoneNumber: from,
-      documentType: "Word", // Andes Docs usa "Word" en vez de "docx"
+      documentType: andesDocType,
       fileName: docName,
-      filePath: `${fileKey}`,
+      filePath: fileKey,
       fileUrl,
       versionId: `${now}`,
       versionNumber: "1", // Andes Docs usa un string aquí
       date: `${now}`, // Guardar timestamp como string
       size: `${fileBuffer.length}`, // Guardar tamaño como string
       updateDate: `${now}`,
-      format: "word", // Andes Docs usa "word" en vez de "docx"
+      format: andesFormat,
       andesDockerDoc: false, // Mantener en false
       expirationDate: null, // Mantener null a menos que aplique
       documentKind:

@@ -25,7 +25,7 @@ class UploadService {
     await sendWhatsAppMessage(
       from,
       "📤 Por favor envía el archivo\n\n" +
-        "Asegúrate de que:\n" +
+        "En alguno de los siguientes formatos:\n" +
         "• Word (.docx)\n" +
         "• PDF (.pdf)\n\n" +
         "Requisitos:\n" +

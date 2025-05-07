@@ -30,7 +30,7 @@ export async function handleDocumentMessage(from: string, message: any) {
     const docName = fileName.replace(/\.[^/.]+$/, "");
     await registerDocumentInAndesDocs(
       from,
-      "documento_subido",
+      "WA Document",
       Date.now().toString(),
       fileKey,
       fileUrl,
@@ -44,7 +44,7 @@ export async function handleDocumentMessage(from: string, message: any) {
       from,
       fileKey,
       Date.now().toString(),
-      "documento_subido"
+      "WA Document"
     );
 
     // Complete the upload process

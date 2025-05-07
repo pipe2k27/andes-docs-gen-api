@@ -50,8 +50,7 @@ export const registerDocumentInAndesDocs = async (
       format: andesFormat,
       andesDockerDoc: false, // Mantener en false
       expirationDate: null, // Mantener null a menos que aplique
-      documentKind:
-        documentType === "reserva" ? "Reserva" : "Autorización de Venta",
+      documentKind: documentType,
       docName,
       fileNameNoExtension: fileName,
       documentId,

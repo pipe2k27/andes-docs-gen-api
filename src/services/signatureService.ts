@@ -17,6 +17,7 @@ const signatureStates: Record<string, SignatureState> = {};
 
 class SignatureService {
   private readonly MAX_SIGNERS = 10;
+
   private readonly EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   async initSignatureFlow(

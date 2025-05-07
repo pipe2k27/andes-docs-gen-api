@@ -26,7 +26,7 @@ router.post("/", validatePhoneMiddleware, async (req, res) => {
     const changes = entry?.changes?.[0];
     const message = changes?.value?.messages?.[0];
 
-    // Structured logging of the relevant message data
+    // Log for received messages
     console.log("📩 WhatsApp Message Received:", {
       contact: {
         waId: changes?.value?.contacts?.[0]?.wa_id,

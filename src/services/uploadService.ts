@@ -24,13 +24,13 @@ class UploadService {
     );
     await sendWhatsAppMessage(
       from,
-      "📤 Por favor envía el archivo\n\n" +
+      "📤 Por favor envía el archivo \n\n" +
         "En alguno de los siguientes formatos:\n" +
         "• Word (.docx)\n" +
-        "• PDF (.pdf)\n\n" +
-        "Requisitos:\n" +
-        "• Tamaño máximo: 10MB\n"
+        "• PDF (.pdf)\n\n"
     );
+
+    await sendWhatsAppMessage(from, "• Tamaño máximo: 10MB\n");
   }
 }
 

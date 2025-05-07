@@ -9,7 +9,7 @@ export const handleDocumentUpload = async (
   fileName: string
 ): Promise<{ fileUrl: string; fileKey: string; fileBuffer: Buffer }> => {
   try {
-    // 1. Obtener URL del media
+    // 1. Obtener URL del document desde Whatsapp
     const mediaUrlRes = await axios.get(`${WHATSAPP_API_URL}/${mediaId}`, {
       headers: {
         Authorization: `Bearer ${WHATSAPP_API_TOKEN}`,
@@ -21,7 +21,7 @@ export const handleDocumentUpload = async (
       throw new Error("No se pudo obtener URL del documento");
     }
 
-    // 2. Descargar el archivo con manejo de errores mejorado
+    // 2. Descargar el documento
     const fileRes = await axios.get(mediaUrlRes.data.url, {
       responseType: "arraybuffer",
       headers: {

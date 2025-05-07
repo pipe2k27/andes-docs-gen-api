@@ -100,7 +100,7 @@ export const reserva_questions: Question[] = [
   },
 ];
 
-export const autorizacion_questions = [
+export const autorizacion_questions: Question[] = [
   {
     key: "ciudad",
     question:

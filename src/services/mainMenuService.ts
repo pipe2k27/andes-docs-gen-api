@@ -12,6 +12,17 @@ class MainMenuService {
       return;
     }
 
+    // Validate input is a number
+    if (!/^\d+$/.test(trimmedText)) {
+      await sendWhatsAppMessage(
+        from,
+        "⚠️ Por favor escribe solo el *número* de la opción que deseas.\n" +
+          "Ejemplo: escribe *1* para generar una Reserva"
+      );
+      await this.sendOptionsMessage(from);
+      return;
+    }
+
     // Handle menu options
     switch (trimmedText) {
       case "1":
@@ -24,7 +35,11 @@ class MainMenuService {
         await uploadService.initUploadFlow(from);
         break;
       default:
-        await this.sendWelcomeMessage(from);
+        await sendWhatsAppMessage(
+          from,
+          "❌ Opción inválida. Por favor elige una de las siguientes opciones:"
+        );
+        await this.sendOptionsMessage(from);
     }
   }
 
@@ -34,9 +49,17 @@ class MainMenuService {
       from,
       "*Gracias por trabajar con Andes Docs 🏔️⚡*"
     );
+    await this.sendOptionsMessage(from);
+  }
+
+  async sendOptionsMessage(from: string) {
     await sendWhatsAppMessage(
       from,
-      "¿Qué documento necesitas gestionar hoy?\n\n1. Generar Reserva\n2. Generar Autorización (Beta)\n3. Enviar documento a firmar\n"
+      "¿Qué documento necesitas gestionar hoy?\n\n" +
+        "1. Generar Reserva\n" +
+        "2. Generar Autorización (Beta)\n" +
+        "3. Enviar documento a firmar\n\n" +
+        "Escribe solo el *número* de la opción que deseas."
     );
   }
 

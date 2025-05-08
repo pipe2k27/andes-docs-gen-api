@@ -3,27 +3,38 @@ import { documentService } from "./documentService";
 import { uploadService } from "./uploadService";
 
 class MainMenuService {
-  async handleMainMenu(from: string, text: string) {
-    const trimmedText = text.trim();
+  private inMenuSelection: Set<string> = new Set();
 
-    // Restart conversation if requested
+  async handleMainMenu(from: string, text: string) {
+    const trimmedText = text.trim().toLowerCase();
+
+    // Si es el primer mensaje o un saludo
+    if (
+      !this.inMenuSelection.has(from) ||
+      ["hola", "hi", "buenas", "hello"].includes(trimmedText)
+    ) {
+      this.inMenuSelection.add(from);
+      await this.sendWelcomeMessage(from);
+      return;
+    }
+
+    // Reiniciar conversación si se solicita
     if (trimmedText === "0") {
       await this.sendRestartMessage(from);
       return;
     }
 
-    // Validate input is a number
-    if (!/^\d+$/.test(trimmedText)) {
+    // Validar solo después de haber mostrado las opciones
+    if (!/^[1-3]$/.test(trimmedText)) {
       await sendWhatsAppMessage(
         from,
-        "⚠️ Por favor escribe solo el *número* de la opción que deseas.\n" +
-          "Ejemplo: escribe *1* para generar una Reserva"
+        "❌ Opción no válida. Por favor responde con el *número* de una de estas opciones:"
       );
       await this.sendOptionsMessage(from);
       return;
     }
 
-    // Handle menu options
+    // Manejar opciones válidas
     switch (trimmedText) {
       case "1":
         await documentService.initDocumentGeneration(from, "reserva");
@@ -34,13 +45,10 @@ class MainMenuService {
       case "3":
         await uploadService.initUploadFlow(from);
         break;
-      default:
-        await sendWhatsAppMessage(
-          from,
-          "❌ Opción inválida. Por favor elige una de las siguientes opciones:"
-        );
-        await this.sendOptionsMessage(from);
     }
+
+    // Salir del modo selección de menú
+    this.inMenuSelection.delete(from);
   }
 
   async sendWelcomeMessage(from: string) {
@@ -57,14 +65,14 @@ class MainMenuService {
       from,
       "¿Qué documento necesitas gestionar hoy?\n\n" +
         "1. Generar Reserva\n" +
-        "2. Generar Autorización (Beta)\n" +
+        "2. Generar Autorización\n" +
         "3. Enviar documento a firmar\n\n" +
-        "Escribe solo el *número* de la opción que deseas."
+        "Escribe solo el *número* de la opción (ej: 1)"
     );
   }
 
   async sendRestartMessage(from: string) {
-    await sendWhatsAppMessage(from, "🔄 Has reiniciado el proceso.");
+    await sendWhatsAppMessage(from, "🔄 Reiniciando el menú principal...");
     await this.sendWelcomeMessage(from);
   }
 }

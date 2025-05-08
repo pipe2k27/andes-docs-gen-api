@@ -13,24 +13,39 @@ class UploadService {
 
   completeUpload(from: string) {
     this.uploadInProgress.delete(from);
+    console.log(`✅ Upload process completed for ${from}`);
   }
 
   async initUploadFlow(from: string) {
+    if (this.isUploadInProgress(from)) {
+      await sendWhatsAppMessage(
+        from,
+        "⚠️ Ya tienes un proceso de subida en curso. Por favor envía tu documento ahora o escribe '0' para cancelar."
+      );
+      return;
+    }
+
     this.startUpload(from);
 
     await sendWhatsAppMessage(
       from,
-      "Primero vamos a subir el documento a *Andes Docs*:"
+      "📤 *Subir documento a Andes Docs*\n\n" +
+        "Por favor envía el archivo en uno de estos formatos:\n" +
+        "• Word (.docx)\n" +
+        "• PDF (.pdf)\n\n" +
+        "Requisitos:\n" +
+        "• Tamaño máximo: 10MB\n" +
+        "• Nombre claro (sin caracteres especiales)\n\n" +
+        "O escribe '0' para cancelar"
     );
+  }
+
+  async cancelUpload(from: string) {
+    this.completeUpload(from);
     await sendWhatsAppMessage(
       from,
-      "📤 Por favor envía el archivo \n\n" +
-        "En alguno de los siguientes formatos:\n" +
-        "• Word (.docx)\n" +
-        "• PDF (.pdf)\n\n"
+      "❌ Proceso de subida cancelado. ¿Qué más necesitas?"
     );
-
-    await sendWhatsAppMessage(from, "• Tamaño máximo: 10MB\n");
   }
 }
 

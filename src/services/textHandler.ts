@@ -7,6 +7,12 @@ import { uploadService } from "./uploadService";
 export async function handleTextMessage(from: string, text: string) {
   const trimmedText = text.trim();
 
+  // Manejar cancelación
+  if (trimmedText === "0" && uploadService.isUploadInProgress(from)) {
+    await uploadService.cancelUpload(from);
+    return;
+  }
+
   // Check if in signature flow
   if (await signatureService.handleSignatureResponse(from, trimmedText)) {
     return;
@@ -19,10 +25,13 @@ export async function handleTextMessage(from: string, text: string) {
     return;
   }
 
+  // Verificar subida en progreso
   if (uploadService.isUploadInProgress(from)) {
     await sendWhatsAppMessage(
       from,
-      "⚠️ Estamos esperando tu documento .docx. Por favor envíalo ahora o cancela el proceso."
+      "⚠️ Estamos esperando tu documento. Por favor:\n" +
+        "• Envía tu archivo (.docx o .pdf)\n" +
+        "• O escribe '0' para cancelar"
     );
     return;
   }

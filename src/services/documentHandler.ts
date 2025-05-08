@@ -47,22 +47,22 @@ export async function handleDocumentMessage(from: string, message: any) {
       "WA Document"
     );
 
-    // Complete the upload process
+    // Finalizar proceso
     uploadService.completeUpload(from);
+
+    await sendWhatsAppMessage(
+      from,
+      "✅ Documento subido correctamente. ¿Necesitas algo más?"
+    );
   } catch (error) {
     console.error("Error en handleDocumentMessage:", error);
+    uploadService.completeUpload(from); // Asegurar limpieza en caso de error
+
     await sendWhatsAppMessage(
       from,
       error instanceof Error
         ? error.message
         : "❌ Error al procesar el documento. Por favor, inténtalo de nuevo."
     );
-
-    if (uploadService.isUploadInProgress(from)) {
-      await sendWhatsAppMessage(
-        from,
-        "🔄 Por favor, envía el documento nuevamente (formato .docx o .pdf)"
-      );
-    }
   }
 }

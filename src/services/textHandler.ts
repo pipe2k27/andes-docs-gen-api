@@ -7,6 +7,12 @@ import { uploadService } from "./uploadService";
 export async function handleTextMessage(from: string, text: string) {
   const trimmedText = text.trim();
 
+  // Manejar cancelación global (en cualquier flujo)
+  if (/^cancelar$/i.test(trimmedText)) {
+    await handleGlobalCancel(from);
+    return;
+  }
+
   // Manejar cancelación
   if (trimmedText === "0" && uploadService.isUploadInProgress(from)) {
     await uploadService.cancelUpload(from);
@@ -38,4 +44,15 @@ export async function handleTextMessage(from: string, text: string) {
 
   // Handle main menu options
   await mainMenuService.handleMainMenu(from, trimmedText);
+}
+
+async function handleGlobalCancel(from: string) {
+  // Limpiar todos los estados posibles
+  documentService.clearDocumentGeneration(from);
+  uploadService.completeUpload(from);
+
+  await sendWhatsAppMessage(
+    from,
+    "❌ Proceso cancelado. Escribe *menu* para iniciar de nuevo."
+  );
 }

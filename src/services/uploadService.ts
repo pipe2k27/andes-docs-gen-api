@@ -44,7 +44,7 @@ class UploadService {
     this.completeUpload(from);
     await sendWhatsAppMessage(
       from,
-      "❌ Proceso de subida cancelado. ¿Qué más necesitas?"
+      "❌ Proceso de subida cancelado. Escribe *menu* para comenzar de nuevo"
     );
   }
 }

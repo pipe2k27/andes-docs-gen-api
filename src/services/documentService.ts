@@ -46,6 +46,15 @@ class DocumentService {
     const generation = this.documentGenerations[from];
     if (!generation) return false;
 
+    if (/^cancelar$/i.test(text.trim())) {
+      this.clearDocumentGeneration(from);
+      await sendWhatsAppMessage(
+        from,
+        "❌ Generación de documento cancelada. Escribe *menu* para iniciar de nuevo."
+      );
+      return true;
+    }
+
     const questions = this.getQuestionsForType(generation.documentType);
     const currentQuestion = questions[generation.step];
 

@@ -69,6 +69,11 @@ class MainMenuService {
         "3. Enviar documento a firmar\n\n" +
         "Escribe solo el *número* de la opción (ej: 1)"
     );
+
+    await sendWhatsAppMessage(
+      from,
+      "Escribe *cancelar* en cualquier momento del proceso para empezar de nuevo."
+    );
   }
 
   async sendRestartMessage(from: string) {

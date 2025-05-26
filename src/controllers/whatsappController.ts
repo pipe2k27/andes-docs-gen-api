@@ -6,7 +6,7 @@ dotenv.config();
 
 const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
-const ACCESS_TOKEN = process.env.WHATS_VERIFY_TOKEN;
+const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 
 export const sendWhatsAppMessage = async (to: string, text: string) => {
   const formattedTo = formatPhoneNumber(to);

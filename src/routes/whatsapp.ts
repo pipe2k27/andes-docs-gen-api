@@ -3,7 +3,7 @@ import { validatePhoneMiddleware } from "../middlewares/validatePhoneMiddleware"
 import { handleIncomingMessage } from "../services/messageHandler";
 
 const router = Router();
-const VERIFY_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 
 // Route to connect Bot to WhatsApp API
 router.get("/", (req, res) => {

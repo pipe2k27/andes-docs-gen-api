@@ -11,10 +11,16 @@ router.get("/", (req, res) => {
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
+  console.log("mode", mode);
+
+  console.log("token", token);
+
   if (mode && token === VERIFY_TOKEN) {
     console.log("✅ Webhook verificado correctamente");
     res.status(200).send(challenge);
   } else {
+    console.log("❌ Webhook no verificado");
+
     res.sendStatus(403);
   }
 });

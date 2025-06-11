@@ -25,51 +25,9 @@ router.get("/", (req, res) => {
   }
 });
 
-router.post("/", validatePhoneMiddleware, async (req, res) => {
-  try {
-    if (req.body.entry) {
-      // 📦 Meta (WABA)
-      const entry = req.body.entry?.[0];
-      const changes = entry?.changes?.[0];
-      const message = changes?.value?.messages?.[0];
-
-      console.log("📩 Meta Message Received:", { message });
-
-      const from = message?.from;
-      if (!message) return void res.status(400).json({ error: "No message" });
-
-      await handleIncomingMessage(from, message);
-      return void res.sendStatus(200);
-    } else if (req.body.Body && req.body.From) {
-      // 📦 Twilio
-      const from = req.body.From.replace("whatsapp:", "");
-      const body = req.body.Body;
-      const waId = req.body.WaId;
-      const profileName = req.body.ProfileName;
-
-      const message = {
-        from,
-        id: req.body.MessageSid,
-        timestamp: Math.floor(Date.now() / 1000).toString(),
-        type: "text",
-        text: { body },
-        waId,
-        profileName,
-        source: "twilio",
-      };
-
-      console.log("📩 Twilio Message:", message);
-
-      await handleIncomingMessage(from, message);
-      return void res.sendStatus(200);
-    } else {
-      console.warn("❌ Estructura desconocida:", req.body);
-      return void res.sendStatus(400);
-    }
-  } catch (error) {
-    console.error("❌ Error procesando el mensaje:", error);
-    return void res.sendStatus(500);
-  }
+router.post("/", (req, res) => {
+  console.log("📥 Webhook received body:", req.body);
+  res.sendStatus(200);
 });
 
 // Message handling

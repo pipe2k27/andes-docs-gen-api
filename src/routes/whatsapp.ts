@@ -25,51 +25,51 @@ router.get("/", (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
-  console.log("📥 Webhook received body:", req.body);
-  res.sendStatus(200);
-});
+// router.post("/", (req, res) => {
+//   console.log("📥 Webhook received body:", req.body);
+//   res.sendStatus(200);
+// });
 
 // Message handling
-// router.post("/", validatePhoneMiddleware, async (req, res) => {
-//   try {
-//     const entry = req.body.entry?.[0];
-//     const changes = entry?.changes?.[0];
-//     const message = changes?.value?.messages?.[0];
+router.post("/", validatePhoneMiddleware, async (req, res) => {
+  try {
+    const entry = req.body.entry?.[0];
+    const changes = entry?.changes?.[0];
+    const message = changes?.value?.messages?.[0];
 
-//     // Log for received messages
-//     console.log("📩 WhatsApp Message Received:", {
-//       contact: {
-//         waId: changes?.value?.contacts?.[0]?.wa_id,
-//         profileName: changes?.value?.contacts?.[0]?.profile?.name,
-//       },
-//       message: message
-//         ? {
-//             from: message.from,
-//             messageId: message.id,
-//             timestamp: message.timestamp,
-//             type: message.type,
-//             content:
-//               message.text?.body ||
-//               message.document?.filename ||
-//               message.image?.caption ||
-//               "[media content]",
-//           }
-//         : null,
-//     });
+    // Log for received messages
+    console.log("📩 WhatsApp Message Received:", {
+      contact: {
+        waId: changes?.value?.contacts?.[0]?.wa_id,
+        profileName: changes?.value?.contacts?.[0]?.profile?.name,
+      },
+      message: message
+        ? {
+            from: message.from,
+            messageId: message.id,
+            timestamp: message.timestamp,
+            type: message.type,
+            content:
+              message.text?.body ||
+              message.document?.filename ||
+              message.image?.caption ||
+              "[media content]",
+          }
+        : null,
+    });
 
-//     const from = message?.from;
+    const from = message?.from;
 
-//     if (!message) {
-//       res.sendStatus(400).json({ error: "Message is not received on request" });
-//     }
+    if (!message) {
+      res.sendStatus(400).json({ error: "Message is not received on request" });
+    }
 
-//     await handleIncomingMessage(from, message);
-//     res.sendStatus(200);
-//   } catch (error) {
-//     console.error("❌ Error procesando el mensaje:", error);
-//     res.sendStatus(500);
-//   }
-// });
+    await handleIncomingMessage(from, message);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("❌ Error procesando el mensaje:", error);
+    res.sendStatus(500);
+  }
+});
 
 export default router;

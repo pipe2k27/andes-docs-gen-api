@@ -1,11 +1,8 @@
-import { sendWhatsAppMessage } from "../controllers/whatsappController";
+import { sendMetaMessage } from "../controllers/whatsappController";
 import { handleDocumentMessage } from "../services/documentHandler";
 import { handleTextMessage } from "./textHandler";
 
 export async function handleIncomingMessage(from: string, message: any) {
-  const source: "meta" | "twilio" =
-    message.source === "twilio" ? "twilio" : "meta";
-
   try {
     // Handle document messages
     if (message.type === "document") {
@@ -19,17 +16,15 @@ export async function handleIncomingMessage(from: string, message: any) {
     }
 
     // Unsupported message type
-    await sendWhatsAppMessage(
+    await sendMetaMessage(
       from,
-      "Lo siento, solo puedo procesar mensajes de texto o documentos .docx",
-      source
+      "Lo siento, solo puedo procesar mensajes de texto o documentos .docx"
     );
   } catch (error) {
     console.error("❌ Error en handleIncomingMessage:", error);
-    await sendWhatsAppMessage(
+    await sendMetaMessage(
       from,
-      "Hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo.",
-      source
+      "Hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo."
     );
     throw error;
   }

@@ -11,10 +11,6 @@ router.get("/", (req, res) => {
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  console.log("mode", mode);
-
-  console.log("token", token);
-
   if (mode && token === VERIFY_TOKEN) {
     console.log("✅ Webhook verificado correctamente");
     res.status(200).send(challenge);
@@ -24,11 +20,6 @@ router.get("/", (req, res) => {
     res.sendStatus(403);
   }
 });
-
-// router.post("/", (req, res) => {
-//   console.log("📥 Webhook received body:", req.body);
-//   res.sendStatus(200);
-// });
 
 // Message handling
 router.post("/", validatePhoneMiddleware, async (req, res) => {

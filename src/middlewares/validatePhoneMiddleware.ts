@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-
 import { Company } from "../models/Company";
 import { companies } from "../config/db";
-import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { formatPhoneNumber } from "../utils/phoneFormatter";
+import { sendWhatsAppMessage } from "../controllers/whatsappController";
+
+// Cache para números no autorizados que ya recibieron el mensaje
+const unauthorizedNotifiedNumbers = new Set<string>();
 
 export const validatePhoneMiddleware = async (
   req: Request,
@@ -20,9 +22,14 @@ export const validatePhoneMiddleware = async (
   }
 
   const from = message.from;
-
-  // Format number for comparison
   const formattedFrom = formatPhoneNumber(from);
+
+  // Verificar si el número ya está en caché como no autorizado
+  if (unauthorizedNotifiedNumbers.has(formattedFrom)) {
+    console.log(`⛔ Número no autorizado (ya notificado): ${from}`);
+    res.sendStatus(403);
+    return;
+  }
 
   // Buscar si el número pertenece a alguna empresa autorizada
   const isAuthorized = companies.some((company: Company) =>
@@ -33,6 +40,8 @@ export const validatePhoneMiddleware = async (
 
   if (!isAuthorized) {
     console.log(`⛔ Número no autorizado: ${from}`);
+    unauthorizedNotifiedNumbers.add(formattedFrom);
+
     await sendWhatsAppMessage(
       from,
       "Lo siento, usted no tiene acceso. Debe comunicarse con soporte. Disculpe las molestias"

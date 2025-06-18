@@ -8,7 +8,7 @@ const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 
-export const sendMetaMessage = async (to: string, text: string) => {
+export const sendWhatsAppMessage = async (to: string, text: string) => {
   const formattedTo = formatPhoneNumber(to);
 
   try {

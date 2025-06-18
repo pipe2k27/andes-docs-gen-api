@@ -1,4 +1,4 @@
-import { sendMetaMessage } from "../controllers/whatsappController";
+import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { handleDocumentMessage } from "../services/documentHandler";
 import { handleTextMessage } from "./textHandler";
 
@@ -16,13 +16,13 @@ export async function handleIncomingMessage(from: string, message: any) {
     }
 
     // Unsupported message type
-    await sendMetaMessage(
+    await sendWhatsAppMessage(
       from,
       "Lo siento, solo puedo procesar mensajes de texto o documentos .docx"
     );
   } catch (error) {
     console.error("❌ Error en handleIncomingMessage:", error);
-    await sendMetaMessage(
+    await sendWhatsAppMessage(
       from,
       "Hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo."
     );

@@ -8,6 +8,8 @@ import logRoutes from "./routes/logRoutes";
 
 import { swaggerSpec, swaggerUi } from "./config/swagger";
 
+const ENV = process.env.ENV;
+
 dotenv.config();
 
 const app = express();
@@ -27,6 +29,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec)); // Fabian A
 app.use("/FA", apiRoutes); // Fabian Achaval API
 
 app.use(logRoutes); // Logger for Fabian Achaval API
+
+console.log("ENVIRONMENTTTT:", ENV);
 
 app.use("/webhook", whatsappWebhookRoute); // Webhook for Andes Docs WhatsApp Bot
 

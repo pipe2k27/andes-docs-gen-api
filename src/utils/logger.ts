@@ -14,9 +14,14 @@ const s3 = new AWS.S3({
 
 // Determinar el nombre del bucket según el entorno
 const ENV = process.env.ENV || "production";
-const BASE_BUCKET_NAME = process.env.AWS_BUCKET_NAME || "wa-generation";
+const DEVELOP_BUCKET_NAME =
+  process.env.AWS_BUCKET_NAME_DEVELOPMENT || "wa-generation";
+const PRODUCTION_BUCKET_NAME =
+  process.env.AWS_BUCKET_NAME_PRODUCTION || "andy-generation";
 const BUCKET_NAME =
-  ENV === "development" ? `${BASE_BUCKET_NAME}-test` : BASE_BUCKET_NAME;
+  ENV === "development"
+    ? `${DEVELOP_BUCKET_NAME}-test`
+    : PRODUCTION_BUCKET_NAME;
 const LOG_FILE_KEY = "logs/requests.log"; // Ruta dentro del bucket
 const SUMMARY_FILE_KEY = "logs/daily_summary.log"; // Resumen diario
 

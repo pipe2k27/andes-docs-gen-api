@@ -12,16 +12,10 @@ const s3 = new AWS.S3({
   region: process.env.AWS_DEFAULT_REGION,
 });
 
+const ENV = process.env.ENV || "development";
+
 // Determinar el nombre del bucket según el entorno
-const ENV = process.env.ENV || "production";
-const DEVELOP_BUCKET_NAME =
-  process.env.AWS_BUCKET_NAME_DEVELOPMENT || "wa-generation";
-const PRODUCTION_BUCKET_NAME =
-  process.env.AWS_BUCKET_NAME_PRODUCTION || "andy-generation";
-const BUCKET_NAME =
-  ENV === "development"
-    ? `${DEVELOP_BUCKET_NAME}-test`
-    : PRODUCTION_BUCKET_NAME;
+const bucket = getBucketByEnv();
 const LOG_FILE_KEY = "logs/requests.log"; // Ruta dentro del bucket
 const SUMMARY_FILE_KEY = "logs/daily_summary.log"; // Resumen diario
 
@@ -51,12 +45,12 @@ export const logRequest = async (
     let existingLogs = "";
     try {
       const { Body } = await s3
-        .getObject({ Bucket: BUCKET_NAME, Key: LOG_FILE_KEY })
+        .getObject({ Bucket: bucket, Key: LOG_FILE_KEY })
         .promise();
       existingLogs = Body?.toString() || "";
     } catch (error) {
       console.log(
-        `No se encontró un log previo en S3 para el bucket ${BUCKET_NAME}, creando uno nuevo.`
+        `No se encontró un log previo en S3 para el bucket ${bucket}, creando uno nuevo.`
       );
     }
 
@@ -66,7 +60,7 @@ export const logRequest = async (
     // Subir el archivo actualizado a S3
     await s3
       .putObject({
-        Bucket: BUCKET_NAME,
+        Bucket: bucket,
         Key: LOG_FILE_KEY,
         Body: newLogContent,
         ContentType: "text/plain",
@@ -98,7 +92,7 @@ cron.schedule("0 3 * * *", async () => {
   try {
     await s3
       .putObject({
-        Bucket: BUCKET_NAME,
+        Bucket: bucket,
         Key: SUMMARY_FILE_KEY,
         Body: summary,
         ContentType: "text/plain",

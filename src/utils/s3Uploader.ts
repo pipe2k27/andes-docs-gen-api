@@ -15,6 +15,8 @@ export const s3StoreFile = async (
     bucket += "-test";
   }
 
+  console.log("INTENTANDO GUARDAR ARCHIVO EN EL BUCKET:", bucket);
+
   const params = {
     Bucket: bucket,
     Key: key,

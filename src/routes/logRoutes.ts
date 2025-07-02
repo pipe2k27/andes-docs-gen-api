@@ -12,15 +12,7 @@ const s3 = new AWS.S3({
   region: process.env.AWS_DEFAULT_REGION,
 });
 
-const ENV = process.env.ENV || "production";
-const DEVELOP_BUCKET_NAME =
-  process.env.AWS_BUCKET_NAME_DEVELOPMENT || "wa-generation";
-const PRODUCTION_BUCKET_NAME =
-  process.env.AWS_BUCKET_NAME_PRODUCTION || "andy-generation";
-const BUCKET_NAME =
-  ENV === "development"
-    ? `${DEVELOP_BUCKET_NAME}-test`
-    : PRODUCTION_BUCKET_NAME;
+const bucket = getBucketByEnv();
 
 const LOG_FILE_KEY = "logs/requests.log";
 
@@ -28,7 +20,7 @@ const LOG_FILE_KEY = "logs/requests.log";
 router.get("/api-calls", async (req, res) => {
   try {
     const { Body } = await s3
-      .getObject({ Bucket: BUCKET_NAME, Key: LOG_FILE_KEY })
+      .getObject({ Bucket: bucket, Key: LOG_FILE_KEY })
       .promise();
 
     const logContent = Body?.toString("utf-8") || "";

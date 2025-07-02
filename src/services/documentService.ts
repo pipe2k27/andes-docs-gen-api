@@ -112,7 +112,9 @@ class DocumentService {
 
       // Subida a S3
       const fileKey = `${docName}.docx`;
-      const fileUrl = await s3StoreFile("wa-generation", fileKey, fileBuffer);
+      const bucket = getBucketByEnv();
+
+      const fileUrl = await s3StoreFile(bucket, fileKey, fileBuffer);
 
       // Registro en Andes Docs
       await registerDocumentInAndesDocs(

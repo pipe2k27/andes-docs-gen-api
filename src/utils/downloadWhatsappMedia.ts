@@ -3,9 +3,6 @@ import { s3StoreFile } from "./s3Uploader";
 
 const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const WHATSAPP_API_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
-const DEVELOPMENT_BUCKET = process.env.AWS_BUCKET_NAME_DEVELOPMENT;
-const PRODUCTION_BUCKET = process.env.AWS_BUCKET_NAME_PRODUCTION;
-const ENV = process.env.ENV;
 
 export const handleDocumentUpload = async (
   mediaId: string,
@@ -59,11 +56,11 @@ export const handleDocumentUpload = async (
 
     let s3Url = "";
 
-    if (ENV === "production") {
-      s3Url = await s3StoreFile(`${PRODUCTION_BUCKET}`, fileKey, fileBuffer);
-    } else {
-      s3Url = await s3StoreFile(`${DEVELOPMENT_BUCKET}`, fileKey, fileBuffer);
-    }
+    console.log("ENVIRONMENT:", ENV);
+
+    const bucket = getBucketByEnv();
+
+    s3Url = await s3StoreFile(bucket, fileKey, fileBuffer);
 
     return {
       fileUrl: s3Url,

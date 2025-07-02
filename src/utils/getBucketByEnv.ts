@@ -2,7 +2,7 @@ const DEVELOPMENT_BUCKET = process.env.AWS_BUCKET_NAME_DEVELOPMENT;
 const PRODUCTION_BUCKET = process.env.AWS_BUCKET_NAME_PRODUCTION;
 const ENV = process.env.ENV;
 
-function getBucketByEnv(): string {
+export function getBucketByEnv(): string {
   if (ENV === "production") {
     if (!PRODUCTION_BUCKET) {
       throw new Error("Missing AWS_BUCKET_NAME_PRODUCTION in environment");

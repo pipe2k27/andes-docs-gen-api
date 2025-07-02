@@ -1,8 +1,10 @@
 import axios from "axios";
 import { s3StoreFile } from "./s3Uploader";
+import { getBucketByEnv } from "./getBucketByEnv";
 
 const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const WHATSAPP_API_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+const ENV = process.env.ENV;
 
 export const handleDocumentUpload = async (
   mediaId: string,

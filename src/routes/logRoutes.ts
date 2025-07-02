@@ -1,6 +1,7 @@
 import { Router } from "express";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
+import { getBucketByEnv } from "../utils/getBucketByEnv";
 
 dotenv.config();
 

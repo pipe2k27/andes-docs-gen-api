@@ -2,6 +2,7 @@ import AWS from "aws-sdk";
 import moment from "moment-timezone";
 import dotenv from "dotenv";
 import cron from "node-cron";
+import { getBucketByEnv } from "./getBucketByEnv";
 
 dotenv.config();
 

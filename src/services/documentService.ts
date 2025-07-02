@@ -10,6 +10,7 @@ import {
 import { registerDocumentInAndesDocs } from "./registerDocumentInAndesDocs";
 import { signatureService } from "./signatureService";
 import NumeroALetras from "../utils/generator/numbersToLetters";
+import { getBucketByEnv } from "../utils/getBucketByEnv";
 
 type DocumentGenerationState = {
   step: number;

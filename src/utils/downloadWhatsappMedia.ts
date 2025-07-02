@@ -60,9 +60,9 @@ export const handleDocumentUpload = async (
     let s3Url = "";
 
     if (ENV === "production") {
-      s3Url = await s3StoreFile("andy-genertion", fileKey, fileBuffer);
+      s3Url = await s3StoreFile(`${PRODUCTION_BUCKET}`, fileKey, fileBuffer);
     } else {
-      s3Url = await s3StoreFile("wa-generation", fileKey, fileBuffer);
+      s3Url = await s3StoreFile(`${DEVELOPMENT_BUCKET}`, fileKey, fileBuffer);
     }
 
     return {

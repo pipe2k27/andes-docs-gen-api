@@ -16,6 +16,7 @@ type DocumentGenerationState = {
   step: number;
   data: Record<string, any>;
   documentType: string;
+  documentId: string; // <-- Agrego documentId aquí
   timeout?: NodeJS.Timeout;
 };
 
@@ -30,10 +31,14 @@ class DocumentService {
   async initDocumentGeneration(from: string, documentType: string) {
     this.clearDocumentGeneration(from); // Limpiar estado previo
 
+    // Generar documentId una sola vez
+    const documentId = Date.now().toString();
+
     this.documentGenerations[from] = {
       step: 0,
       data: {},
       documentType,
+      documentId, // <-- Guardar documentId
     };
 
     this.startTimeout(from);
@@ -121,7 +126,7 @@ class DocumentService {
       await registerDocumentInAndesDocs(
         from,
         generation.documentType,
-        Date.now().toString(),
+        generation.documentId, // <-- Usar el mismo documentId
         fileKey,
         fileUrl,
         fileBuffer,
@@ -141,7 +146,7 @@ class DocumentService {
       await signatureService.initSignatureFlow(
         from,
         fileKey,
-        Date.now().toString(),
+        generation.documentId, // <-- Usar el mismo documentId
         generation.documentType
       );
     } catch (error) {

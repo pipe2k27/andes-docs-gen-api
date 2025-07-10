@@ -196,14 +196,19 @@ class SignatureService {
         signers: state.signers,
       });
 
-      // Mensaje inicial de confirmación
+      // Verificar si la respuesta fue exitosa
+      if (!response?.success) {
+        throw new Error("Error en la respuesta del servidor");
+      }
+
+      // Mensaje inicial de confirmación (solo si fue exitoso)
       await sendWhatsAppMessage(
         from,
         "✅ *Documento enviado para firma electrónica correctamente*"
       );
 
       // Enviamos los links de cada firmante en mensajes separados
-      if (response?.success && response.data?.data) {
+      if (response.data?.data) {
         for (const signerData of response.data.data) {
           const signerIndex = response.data.data.indexOf(signerData);
           const signerName =

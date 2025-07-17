@@ -82,7 +82,7 @@ export const soldati_autorización_template = {
     {
       type: "newParagraph",
       id: "12",
-      text: `En prueba de conformidad se firman 2 ejemplares de un mismo tenor y a un solo efecto en las oficinas de GRUPO SOLDATI S.A. sitas en {oficinas}, el {fecha}.\n`,
+      text: `En prueba de conformidad se firman 2 ejemplares de un mismo tenor y a un solo efecto en las oficinas de GRUPO SOLDATI S.A. sitas en {oficina}, el {fecha}.\n`,
       dependencies: [],
     },
     {

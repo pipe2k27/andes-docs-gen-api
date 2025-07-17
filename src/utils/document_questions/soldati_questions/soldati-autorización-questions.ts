@@ -2,7 +2,7 @@ import { Question } from "../../../types/questions";
 
 export const soldati_autorizacion_questions: Question[] = [
   {
-    key: "fecha",
+    key: "oficina",
     question:
       "¿Qué oficina de GRUPO SOLDATI está a cargo de la presente Operación?",
   },
@@ -97,14 +97,18 @@ export const soldati_autorizacion_questions: Question[] = [
     format: "numberAndLetters",
   },
   {
+    key: "porcentaje",
+    question:
+      "Porcentaje de los honorarios inmobiliarios sobre el total del contrato. (Escriba números con decimales, ej: 1,5 para 1.5%)",
+    format: "percentage",
+  },
+  {
+    key: "fecha",
+    question: "¿Cuál es la *fecha* de la operación?",
+  },
+  {
     key: "nombreDocumento",
     question:
       "¿Con qué *nombre* te gustaría guardar este documento? (Ej: Reserva Casa Caballito, Autorización Depto CABA)",
-  },
-  {
-    key: "porcentaje",
-    question:
-      "Porcentaje de los honorarios inmobiliarios sobre el total del contrato. (Escriba sólo números, sin puntos ni comas)",
-    format: "number",
   },
 ];

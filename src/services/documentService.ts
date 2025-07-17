@@ -212,9 +212,15 @@ class DocumentService {
     // Original validation for other questions
     if (!question.options && trimmedText === "9") return true;
 
-    if (question.format?.includes("number")) {
+    if (question.format === "number") {
       if (!/^\d+$/.test(trimmedText)) {
         return "🔢 Solo se permiten números enteros (ej: 150000)\nEscribe 9 si no tienes el dato";
+      }
+    }
+
+    if (question.format === "percentage") {
+      if (!/^\d+([,.]\d+)?$/.test(trimmedText)) {
+        return "🔢 Solo se permiten números con decimales (ej: 1,5 o 2.5)\n";
       }
     }
 
@@ -240,6 +246,12 @@ class DocumentService {
         question.options.find((opt) => opt.value === trimmedText)?.label || text
       );
     if (question.format === "number") return Number(trimmedText);
+    if (question.format === "percentage") {
+      // Convertir coma a punto para el parsing y luego formatear con coma
+      const normalizedText = trimmedText.replace(",", ".");
+      const number = Number(normalizedText);
+      return `${number.toFixed(1).replace(".", ",")}`;
+    }
     if (question.format === "numberAndLetters") {
       const number = Number(trimmedText);
       return `${number} (${NumeroALetras(number).toUpperCase()})`;

@@ -1,7 +1,11 @@
 import { Company } from "../models/Company";
+import { andes_autorizacion_questions } from "../utils/document_questions/andesdocs_questions/andes-autorización-questions";
+import { andes_reserva_questions } from "../utils/document_questions/andesdocs_questions/andes-reserva-questions";
+import { soldati_autorizacion_questions } from "../utils/document_questions/soldati_questions/soldati-autorización-questions";
 import { styles_andes } from "../utils/document_styles/andes-docs";
 import { andes_autorizacion_template } from "../utils/document_templates/andes-autorización-template";
 import { andes_reserva_template } from "../utils/document_templates/andes-reserva-template";
+import { soldati_autorización_template } from "../utils/document_templates/soldati-autorización-template";
 
 export const companies: Company[] = [
   {
@@ -20,7 +24,11 @@ export const companies: Company[] = [
     styles: styles_andes,
     templates: {
       reserva: andes_reserva_template,
-      autorizacion: andes_autorizacion_template,
+      autorizacion: soldati_autorización_template,
+    },
+    questions: {
+      reserva: andes_reserva_questions,
+      autorizacion: soldati_autorizacion_questions,
     },
   },
   {
@@ -32,15 +40,23 @@ export const companies: Company[] = [
       reserva: null, // Aún no definido
       autorizacion: null,
     },
+    questions: {
+      reserva: null,
+      autorizacion: null,
+    },
   },
   {
-    companyId: "78901",
+    companyId: "12346",
     companyName: "Soldati",
     whatsappNumbers: ["5491145678901", "5491132109876"], // numeros falsos
     styles: null, // Aún no definido
     templates: {
       reserva: null, // Aún no definido
-      autorizacion: null,
+      autorizacion: soldati_autorización_template,
+    },
+    questions: {
+      reserva: null,
+      autorizacion: soldati_autorizacion_questions,
     },
   },
 ];

@@ -1,3 +1,4 @@
+import { Question } from "../types/questions";
 import { DocumentStyles } from "../utils/document_styles/Document";
 
 export interface Company {
@@ -8,5 +9,9 @@ export interface Company {
   templates: {
     reserva: any;
     autorizacion: any;
+  };
+  questions: {
+    reserva?: Question[] | null;
+    autorizacion?: Question[] | null;
   };
 }

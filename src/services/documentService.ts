@@ -61,7 +61,7 @@ class DocumentService {
       return true;
     }
 
-    const questions = this.getQuestionsForType(generation.documentType);
+    const questions = this.getQuestionsForType(generation.documentType, from);
     const currentQuestion = questions[generation.step];
 
     // Validación mejorada
@@ -160,10 +160,28 @@ class DocumentService {
   }
 
   // Helper methods
-  private getQuestionsForType(documentType: string) {
-    return documentType === "reserva"
-      ? reserva_questions
-      : autorizacion_questions;
+  private getQuestionsForType(documentType: string, from: string) {
+    const company = getCompanyByPhone(from);
+    if (!company) {
+      // Fallback a preguntas generales si no se encuentra la empresa
+      return documentType === "reserva"
+        ? reserva_questions
+        : autorizacion_questions;
+    }
+
+    const questions =
+      documentType === "reserva"
+        ? company.questions.reserva
+        : company.questions.autorizacion;
+
+    // Si la empresa no tiene preguntas personalizadas, usar las generales
+    if (!questions) {
+      return documentType === "reserva"
+        ? reserva_questions
+        : autorizacion_questions;
+    }
+
+    return questions;
   }
 
   private getDocumentTemplate(company: any, documentType: string) {
@@ -234,7 +252,7 @@ class DocumentService {
     const generation = this.documentGenerations[from];
     if (!generation) return;
 
-    const questions = this.getQuestionsForType(generation.documentType);
+    const questions = this.getQuestionsForType(generation.documentType, from);
     const question = questions[generation.step];
 
     let message = question.question;

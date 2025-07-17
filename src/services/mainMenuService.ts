@@ -63,7 +63,7 @@ class MainMenuService {
   async sendOptionsMessage(from: string) {
     await sendWhatsAppMessage(
       from,
-      "¿Qué documento necesitas gestionar hoy?\n\n" +
+      "¿Con qué te puedo ayudar hoy?\n\n" +
         "1. Generar Reserva\n" +
         "2. Generar Autorización\n" +
         "3. Enviar documento a firmar\n\n" +

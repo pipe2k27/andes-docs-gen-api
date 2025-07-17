@@ -2,13 +2,19 @@ import { Question } from "../../../types/questions";
 
 export const soldati_autorizacion_questions: Question[] = [
   {
-    key: "oficina",
-    question:
-      "¿Qué oficina de GRUPO SOLDATI está a cargo de la presente Operación?",
+    key: "tipoInmueble",
+    question: "¿Qué *tipo de inmueble* se está reservando?",
+    options: [
+      { value: "1", label: "Departamento" },
+      { value: "2", label: "Casa" },
+      { value: "3", label: "Lote" },
+      { value: "4", label: "Cochera" },
+    ],
   },
   {
     key: "oficina",
-    question: "¿Qué tipo de inmueble se está reservando?",
+    question:
+      "¿Qué oficina de GRUPO SOLDATI está a cargo de la presente Operación?",
     options: [
       {
         value: "1",

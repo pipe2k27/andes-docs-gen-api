@@ -9,7 +9,7 @@ export const soldati_autorización_template = {
     {
       type: "newParagraph",
       id: "1",
-      text: " Por medio de la presente {nombreAutorizante}, DNI N° {dniAutorizante}, con domicilio en {direccionReservante},  y constituyendo domicilio electrónico en los términos del art 75 del Código Civil y Comercial de la República Argentina en {emailAutorizante}  (en adelante, el “Autorizante”), con carácter de EXCLUSIVIDAD a la firma GRUPO SOLDATI S.A., con domicilio en {oficinas} (en adelante, el “Autorizado”), a comercializar en VENTA del inmueble de su propiedad ubicado en {direccionInmueble } (en adelante el “Inmueble”). \n ",
+      text: " Por medio de la presente {nombreAutorizante}, DNI N° {dniAutorizante}, con domicilio en {direccionReservante},  y constituyendo domicilio electrónico en los términos del art 75 del Código Civil y Comercial de la República Argentina en {emailAutorizante}  (en adelante, el “Autorizante”), con carácter de EXCLUSIVIDAD a la firma GRUPO SOLDATI S.A., con domicilio en {oficinas} (en adelante, el “Autorizado”), a comercializar en VENTA del {tipoInmueble} de su propiedad ubicado en {direccionInmueble} (en adelante el “Inmueble”). \n ",
       dependencies: [],
     },
     {

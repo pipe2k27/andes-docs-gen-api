@@ -22,7 +22,7 @@ export const companies: Company[] = [
       "5491168220080",
       "54111568220080",
     ],
-    styles: styles_andes,
+    styles: styles_soldati,
     templates: {
       reserva: andes_reserva_template,
       autorizacion: soldati_autorización_template,

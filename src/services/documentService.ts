@@ -2,11 +2,7 @@ import { sendWhatsAppMessage } from "../controllers/whatsappController";
 import { generateAndDownloadWord } from "../utils/generator/wordGeneration";
 import { getCompanyByPhone } from "../config/db";
 import { s3StoreFile } from "../utils/s3Uploader";
-import {
-  reserva_questions,
-  autorizacion_questions,
-  Question,
-} from "../common/whatsapp-questions";
+import { Question, Option } from "../types/questions";
 import { registerDocumentInAndesDocs } from "./registerDocumentInAndesDocs";
 import { signatureService } from "./signatureService";
 import NumeroALetras from "../utils/generator/numbersToLetters";
@@ -163,10 +159,7 @@ class DocumentService {
   private getQuestionsForType(documentType: string, from: string) {
     const company = getCompanyByPhone(from);
     if (!company) {
-      // Fallback a preguntas generales si no se encuentra la empresa
-      return documentType === "reserva"
-        ? reserva_questions
-        : autorizacion_questions;
+      throw new Error("⚠️ Empresa no registrada");
     }
 
     const questions =
@@ -174,11 +167,8 @@ class DocumentService {
         ? company.questions.reserva
         : company.questions.autorizacion;
 
-    // Si la empresa no tiene preguntas personalizadas, usar las generales
     if (!questions) {
-      return documentType === "reserva"
-        ? reserva_questions
-        : autorizacion_questions;
+      throw new Error(`❌ Preguntas para ${documentType} no configuradas`);
     }
 
     return questions;
@@ -226,10 +216,10 @@ class DocumentService {
 
     if (
       question.options &&
-      !question.options.some((opt) => opt.value === trimmedText)
+      !question.options.some((opt: Option) => opt.value === trimmedText)
     ) {
       const optionsText = question.options
-        .map((opt) => `${opt.value}. ${opt.label}`)
+        .map((opt: Option) => `${opt.value}. ${opt.label}`)
         .join("\n");
       return `❌ Escribe solo el número de la opción:\n${optionsText}`;
     }
@@ -243,7 +233,8 @@ class DocumentService {
     if (trimmedText === "9") return "__________";
     if (question.options)
       return (
-        question.options.find((opt) => opt.value === trimmedText)?.label || text
+        question.options.find((opt: Option) => opt.value === trimmedText)
+          ?.label || text
       );
     if (question.format === "number") return Number(trimmedText);
     if (question.format === "percentage") {
@@ -280,7 +271,9 @@ class DocumentService {
     } else {
       message +=
         "\n\n" +
-        question.options.map((opt) => `${opt.value}. ${opt.label}`).join("\n");
+        question.options
+          .map((opt: Option) => `${opt.value}. ${opt.label}`)
+          .join("\n");
     }
 
     await sendWhatsAppMessage(from, message);

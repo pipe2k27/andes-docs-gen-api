@@ -1,4 +1,4 @@
-import { Question } from "../common/whatsapp-questions";
+import { Question } from "../types/questions";
 
 // Función para formatear preguntas con opciones
 export const formatQuestionWithOptions = (question: Question) => {

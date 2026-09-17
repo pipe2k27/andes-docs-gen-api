@@ -29,7 +29,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: "https://fa-docs-generate-api.onrender.com/public-api/v1",
+        url: "https://f-achaval.onrender.com/public-api/v1",
         description: "Producción",
       },
       {

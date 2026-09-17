@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import apiRoutes from "./routes/api";
 import whatsappWebhookRoute from "./routes/whatsapp";
 import logRoutes from "./routes/logRoutes";
+import publicApiRouter from "./publicApi";
 
 import { swaggerSpec, swaggerUi } from "./config/swagger";
 
@@ -33,6 +34,8 @@ app.use(logRoutes); // Logger for Fabian Achaval API
 console.log("ENVIRONMENTTTT:", ENV);
 
 app.use("/webhook", whatsappWebhookRoute); // Webhook for Andes Docs WhatsApp Bot
+
+app.use("/public-api/v1", publicApiRouter); // Public REST API for external integrations (CB Seniority, etc.)
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

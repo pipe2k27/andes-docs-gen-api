@@ -2,7 +2,7 @@ import { Router, Response } from "express";
 import { validationResult } from "express-validator";
 import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { listDocumentsDto } from "../dtos/listDocumentsDto";
-import { listDocuments, StatusFilter } from "../services/signaturesService";
+import { listDocuments, ListScope, StatusFilter } from "../services/signaturesService";
 import { errors } from "../common/errors";
 import { AuthenticatedApiRequest } from "../types";
 
@@ -24,21 +24,34 @@ router.get(
 
     try {
       const companyId = req.companyId as string;
-      const email = String(req.query.email);
+      const scope: ListScope = req.query.scope === "company" ? "company" : "user";
+      const email = scope === "user" ? String(req.query.email) : undefined;
       const status = (req.query.status as StatusFilter) || "all";
       const limit = req.query.limit ? Number(req.query.limit) : 50;
+      const cursor = req.query.cursor ? String(req.query.cursor) : undefined;
 
-      const result = await listDocuments({ companyId, email, status, limit });
+      if (scope === "company") {
+        console.info(
+          `[public-api] company-scope listing by key "${req.apiKeyLabel}" (company ${companyId})`,
+        );
+      }
 
-      if (!result) {
+      const result = await listDocuments({ companyId, scope, email, status, limit, cursor });
+
+      if (result.kind === "userNotFound") {
         res.status(404).json({ error: errors.userNotFound });
+        return;
+      }
+
+      if (result.kind === "invalidCursor") {
+        res.status(400).json({ error: errors.invalidCursor });
         return;
       }
 
       res.status(200).json({
         user: result.user,
         data: result.documents,
-        nextCursor: null,
+        nextCursor: result.nextCursor,
       });
     } catch (err) {
       console.error("GET /public-api/v1/documents error:", err);

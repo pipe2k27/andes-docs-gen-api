@@ -20,6 +20,15 @@ const options: swaggerJsdoc.Options = {
         "- `supervisor`: ve los propios y los de sus usuarios supervisados.",
         "- `user` / `user-editor`: ve solo los documentos que creó.",
         "",
+        "**Vista de toda la empresa:** enviando `scope=company` (sin `email`) se",
+        "devuelven todos los documentos de la empresa, como los ve un administrador",
+        "en la plataforma web. Quien integra la API es responsable de habilitar esta",
+        "vista solo a las personas que corresponda.",
+        "",
+        "**Paginación:** los resultados vienen ordenados del más reciente al más",
+        "antiguo. Si hay más resultados, la respuesta incluye `nextCursor`; para",
+        "pedir la página siguiente, repetir la misma request agregando `cursor=<nextCursor>`.",
+        "",
         "**Soporte:** contactar a Andes Docs para renovación de claves o soporte técnico.",
       ].join("\n"),
       contact: {
@@ -146,7 +155,12 @@ const options: swaggerJsdoc.Options = {
           type: "object",
           required: ["user", "data", "nextCursor"],
           properties: {
-            user: { $ref: "#/components/schemas/User" },
+            user: {
+              allOf: [{ $ref: "#/components/schemas/User" }],
+              nullable: true,
+              description:
+                "Usuario consultado. `null` cuando se usa `scope=company`.",
+            },
             data: {
               type: "array",
               items: { $ref: "#/components/schemas/Document" },
@@ -155,8 +169,8 @@ const options: swaggerJsdoc.Options = {
               type: "string",
               nullable: true,
               description:
-                "Cursor de paginación (reservado). Actualmente siempre `null`; usar `limit` para acotar resultados.",
-              example: null,
+                "Cursor para pedir la página siguiente (enviarlo como `cursor`). `null` cuando no hay más resultados.",
+              example: "eyJkIjoxNzM1Nzc2MDAwMDAwLCJpZCI6IjE3MzU3NzYwMDAwMDAifQ",
             },
           },
         },
@@ -236,7 +250,7 @@ const options: swaggerJsdoc.Options = {
                     details: [
                       {
                         type: "field",
-                        msg: "email is required",
+                        msg: "email is required unless scope=company",
                         path: "email",
                         location: "query",
                       },
@@ -290,13 +304,17 @@ const options: swaggerJsdoc.Options = {
       "/documents": {
         get: {
           tags: ["Documents"],
-          summary: "Listar documentos por email",
+          summary: "Listar documentos (por usuario o de toda la empresa)",
           description: [
-            "Devuelve los documentos de firma electrónica asociados al `email`",
-            "indicado, dentro de la empresa vinculada a la API key.",
+            "Devuelve los documentos de firma electrónica de la empresa vinculada",
+            "a la API key, del más reciente al más antiguo.",
             "",
-            "El scope de resultados depende del rol del usuario consultado",
-            "(ver descripción general de la API).",
+            "- Con `email`: el scope depende del rol de ese usuario",
+            "  (ver descripción general de la API).",
+            "- Con `scope=company` (sin `email`): todos los documentos de la empresa.",
+            "",
+            "Para recorrer todos los resultados, usar `nextCursor` como `cursor`",
+            "en la request siguiente hasta que venga `null`.",
             "",
             "El campo `downloadUrl` provee el link para abrir/descargar el PDF firmado.",
             "Cuando el documento aún está `pending`, `downloadUrl` y `signedAt` son `null`.",
@@ -304,11 +322,19 @@ const options: swaggerJsdoc.Options = {
           parameters: [
             {
               in: "query",
+              name: "scope",
+              required: false,
+              schema: { type: "string", enum: ["user", "company"], default: "user" },
+              description:
+                "`user` (default) filtra por el usuario indicado en `email`. `company` devuelve todos los documentos de la empresa y no admite `email`.",
+            },
+            {
+              in: "query",
               name: "email",
-              required: true,
+              required: false,
               schema: { type: "string", format: "email" },
               description:
-                "Email del usuario de Andes Docs cuyos documentos se quieren consultar.",
+                "Email del usuario de Andes Docs cuyos documentos se quieren consultar. Obligatorio salvo con `scope=company`.",
               example: "usuario@empresa.com",
             },
             {
@@ -329,7 +355,15 @@ const options: swaggerJsdoc.Options = {
               required: false,
               schema: { type: "integer", minimum: 1, maximum: 200, default: 50 },
               description:
-                "Cantidad máxima de resultados a devolver (entre 1 y 200).",
+                "Cantidad máxima de resultados por página (entre 1 y 200).",
+            },
+            {
+              in: "query",
+              name: "cursor",
+              required: false,
+              schema: { type: "string" },
+              description:
+                "Valor de `nextCursor` de la respuesta anterior, para obtener la página siguiente. Mantener los mismos filtros entre páginas.",
             },
           ],
           responses: {
@@ -367,7 +401,8 @@ const options: swaggerJsdoc.Options = {
                         creatorEmail: "usuario@empresa.com",
                       },
                     ],
-                    nextCursor: null,
+                    nextCursor:
+                      "eyJkIjoxNzM1Nzc2MDAwMDAwLCJpZCI6IjE3MzU3NzYwMDAwMDAifQ",
                   },
                 },
               },

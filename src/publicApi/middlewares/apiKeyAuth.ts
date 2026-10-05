@@ -31,6 +31,9 @@ const loadEntries = (): ApiKeyEntry[] => {
   }
 };
 
+const companyIdsOf = (entry: ApiKeyEntry): string[] =>
+  Array.from(new Set([entry.companyId, ...(entry.companyIds || [])].map(String)));
+
 export const apiKeyAuth = async (
   req: AuthenticatedApiRequest,
   res: Response,
@@ -53,7 +56,7 @@ export const apiKeyAuth = async (
     try {
       const match = await bcrypt.compare(apiKey, entry.hash);
       if (match) {
-        req.companyId = entry.companyId;
+        req.companyIds = companyIdsOf(entry);
         req.apiKeyLabel = entry.label;
         next();
         return;

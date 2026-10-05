@@ -6,10 +6,14 @@ export const errors = {
     code: "INVALID_CURSOR",
     message: "cursor is invalid; use the nextCursor value returned by a previous response",
   },
+  companyNotAllowed: {
+    code: "COMPANY_NOT_ALLOWED",
+    message: "companyId is not one of the companies linked to this API key",
+  },
   invalidQuery: { code: "INVALID_QUERY", message: "One or more query parameters are invalid" },
   userNotFound: {
     code: "USER_NOT_FOUND",
-    message: "The provided email is not registered for this company",
+    message: "The provided email is not registered for the companies linked to this API key",
   },
   internal: { code: "INTERNAL_ERROR", message: "Internal server error" },
 };

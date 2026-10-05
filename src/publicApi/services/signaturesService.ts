@@ -6,7 +6,7 @@ export type StatusFilter = "pending" | "signed" | "all";
 export type ListScope = "user" | "company";
 
 export interface ListDocumentsInput {
-  companyId: string;
+  companyIds: string[];
   scope: ListScope;
   email?: string;
   status?: StatusFilter;
@@ -17,7 +17,7 @@ export interface ListDocumentsInput {
 export type ListDocumentsResult =
   | {
       kind: "ok";
-      user: Pick<UserItem, "userId" | "email" | "role"> | null;
+      user: Pick<UserItem, "userId" | "email" | "role" | "companyId"> | null;
       documents: PublicDocument[];
       nextCursor: string | null;
     }
@@ -27,6 +27,8 @@ export type ListDocumentsResult =
 interface CursorPosition {
   d: number;
   id: string;
+  // companyId; absent in cursors issued before keys could span several companies.
+  c?: string;
 }
 
 const ADMIN_ROLES: UserItem["role"][] = ["admin", "admin-editor"];
@@ -63,13 +65,17 @@ const createdMillis = (s: SignatureItem) => {
   return Number.isFinite(millis) ? millis : 0;
 };
 
-// Newest first; signatureId breaks ties so the order is total and stable across requests.
+const compareDesc = (a: string, b: string) => (a < b ? 1 : a > b ? -1 : 0);
+
+// Newest first; signatureId (then companyId) breaks ties so the order is total and
+// stable across requests.
 const compareNewestFirst = (a: CursorPosition, b: CursorPosition) =>
-  b.d - a.d || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0);
+  b.d - a.d || compareDesc(a.id, b.id) || compareDesc(a.c ?? "", b.c ?? "");
 
 const positionOf = (s: SignatureItem): CursorPosition => ({
   d: createdMillis(s),
   id: String(s.signatureId),
+  c: String(s.companyId),
 });
 
 const encodeCursor = (position: CursorPosition) =>
@@ -79,14 +85,15 @@ const decodeCursor = (cursor: string): CursorPosition | null => {
   try {
     const parsed = JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
     if (typeof parsed?.d !== "number" || typeof parsed?.id !== "string") return null;
-    return { d: parsed.d, id: parsed.id };
+    if (parsed.c !== undefined && typeof parsed.c !== "string") return null;
+    return { d: parsed.d, id: parsed.id, c: parsed.c };
   } catch {
     return null;
   }
 };
 
 export const listDocuments = async ({
-  companyId,
+  companyIds,
   scope,
   email,
   status = "all",
@@ -99,14 +106,24 @@ export const listDocuments = async ({
     if (!after) return { kind: "invalidCursor" };
   }
 
-  let user: UserItem | null = null;
-  if (scope === "user") {
-    user = await findUserByEmailForCompany(email as string, companyId);
-    if (!user) return { kind: "userNotFound" };
-  }
+  // The same email can be a different user (and role) in each company of the key.
+  const perCompany = await Promise.all(
+    companyIds.map(async (companyId) => {
+      const user =
+        scope === "user"
+          ? await findUserByEmailForCompany(email as string, companyId)
+          : null;
+      if (scope === "user" && !user) return { user, signatures: [] };
 
-  const allSignatures = await getAllCompanySignatures(companyId);
-  const scoped = user ? filterByScope(allSignatures, user) : allSignatures;
+      const signatures = await getAllCompanySignatures(companyId);
+      return { user, signatures: user ? filterByScope(signatures, user) : signatures };
+    }),
+  );
+
+  const user = perCompany.find((c) => c.user)?.user ?? null;
+  if (scope === "user" && !user) return { kind: "userNotFound" };
+
+  const scoped = perCompany.flatMap((c) => c.signatures);
   const filtered = filterByStatus(scoped, status).sort((a, b) =>
     compareNewestFirst(positionOf(a), positionOf(b)),
   );
@@ -121,7 +138,14 @@ export const listDocuments = async ({
 
   return {
     kind: "ok",
-    user: user ? { userId: user.userId, email: user.email, role: user.role } : null,
+    user: user
+      ? {
+          userId: user.userId,
+          email: user.email,
+          role: user.role,
+          companyId: String(user.companyId),
+        }
+      : null,
     documents: page.map(toPublicDocument),
     nextCursor: hasMore && last ? encodeCursor(positionOf(last)) : null,
   };

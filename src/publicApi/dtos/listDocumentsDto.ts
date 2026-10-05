@@ -21,6 +21,11 @@ export const listDocumentsDto = [
     .not()
     .exists()
     .withMessage("email must not be sent when scope=company"),
+  query("companyId")
+    .optional()
+    .isString()
+    .isLength({ min: 1, max: 64 })
+    .withMessage("companyId must be a non-empty string"),
   query("status")
     .optional()
     .isIn(VALID_STATUS as unknown as string[])

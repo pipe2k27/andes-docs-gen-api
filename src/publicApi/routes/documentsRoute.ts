@@ -23,7 +23,17 @@ router.get(
     }
 
     try {
-      const companyId = req.companyId as string;
+      const allowedCompanyIds = req.companyIds as string[];
+      const requestedCompanyId = req.query.companyId
+        ? String(req.query.companyId)
+        : undefined;
+
+      if (requestedCompanyId && !allowedCompanyIds.includes(requestedCompanyId)) {
+        res.status(400).json({ error: errors.companyNotAllowed });
+        return;
+      }
+
+      const companyIds = requestedCompanyId ? [requestedCompanyId] : allowedCompanyIds;
       const scope: ListScope = req.query.scope === "company" ? "company" : "user";
       const email = scope === "user" ? String(req.query.email) : undefined;
       const status = (req.query.status as StatusFilter) || "all";
@@ -32,11 +42,11 @@ router.get(
 
       if (scope === "company") {
         console.info(
-          `[public-api] company-scope listing by key "${req.apiKeyLabel}" (company ${companyId})`,
+          `[public-api] company-scope listing by key "${req.apiKeyLabel}" (companies ${companyIds.join(", ")})`,
         );
       }
 
-      const result = await listDocuments({ companyId, scope, email, status, limit, cursor });
+      const result = await listDocuments({ companyIds, scope, email, status, limit, cursor });
 
       if (result.kind === "userNotFound") {
         res.status(404).json({ error: errors.userNotFound });

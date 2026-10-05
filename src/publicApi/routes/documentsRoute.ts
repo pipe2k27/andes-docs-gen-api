@@ -23,17 +23,7 @@ router.get(
     }
 
     try {
-      const allowedCompanyIds = req.companyIds as string[];
-      const requestedCompanyId = req.query.companyId
-        ? String(req.query.companyId)
-        : undefined;
-
-      if (requestedCompanyId && !allowedCompanyIds.includes(requestedCompanyId)) {
-        res.status(400).json({ error: errors.companyNotAllowed });
-        return;
-      }
-
-      const companyIds = requestedCompanyId ? [requestedCompanyId] : allowedCompanyIds;
+      const companyIds = req.companyIds as string[];
       const scope: ListScope = req.query.scope === "company" ? "company" : "user";
       const email = scope === "user" ? String(req.query.email) : undefined;
       const status = (req.query.status as StatusFilter) || "all";

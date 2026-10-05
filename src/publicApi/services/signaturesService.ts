@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { getAllCompanySignatures, SignatureItem } from "../dynamoDB/signaturesRepo";
 import { findUserByEmailForCompany, UserItem } from "../dynamoDB/usersRepo";
 import { PublicDocument, toPublicDocument } from "../mappers/signatureMapper";
@@ -17,7 +18,7 @@ export interface ListDocumentsInput {
 export type ListDocumentsResult =
   | {
       kind: "ok";
-      user: Pick<UserItem, "userId" | "email" | "role" | "companyId"> | null;
+      user: Pick<UserItem, "userId" | "email" | "role"> | null;
       documents: PublicDocument[];
       nextCursor: string | null;
     }
@@ -27,7 +28,8 @@ export type ListDocumentsResult =
 interface CursorPosition {
   d: number;
   id: string;
-  // companyId; absent in cursors issued before keys could span several companies.
+  // Company tiebreaker (hashed, so the cursor does not expose the companyId); absent
+  // in cursors issued before keys could span several companies.
   c?: string;
 }
 
@@ -67,7 +69,10 @@ const createdMillis = (s: SignatureItem) => {
 
 const compareDesc = (a: string, b: string) => (a < b ? 1 : a > b ? -1 : 0);
 
-// Newest first; signatureId (then companyId) breaks ties so the order is total and
+const companyTiebreaker = (companyId: string) =>
+  createHash("sha256").update(String(companyId)).digest("hex").slice(0, 8);
+
+// Newest first; signatureId (then company) breaks ties so the order is total and
 // stable across requests.
 const compareNewestFirst = (a: CursorPosition, b: CursorPosition) =>
   b.d - a.d || compareDesc(a.id, b.id) || compareDesc(a.c ?? "", b.c ?? "");
@@ -75,7 +80,7 @@ const compareNewestFirst = (a: CursorPosition, b: CursorPosition) =>
 const positionOf = (s: SignatureItem): CursorPosition => ({
   d: createdMillis(s),
   id: String(s.signatureId),
-  c: String(s.companyId),
+  c: companyTiebreaker(s.companyId),
 });
 
 const encodeCursor = (position: CursorPosition) =>
@@ -138,14 +143,7 @@ export const listDocuments = async ({
 
   return {
     kind: "ok",
-    user: user
-      ? {
-          userId: user.userId,
-          email: user.email,
-          role: user.role,
-          companyId: String(user.companyId),
-        }
-      : null,
+    user: user ? { userId: user.userId, email: user.email, role: user.role } : null,
     documents: page.map(toPublicDocument),
     nextCursor: hasMore && last ? encodeCursor(positionOf(last)) : null,
   };

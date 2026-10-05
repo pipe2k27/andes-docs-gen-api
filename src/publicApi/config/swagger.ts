@@ -17,8 +17,7 @@ const options: swaggerJsdoc.Options = {
         "",
         "**Claves con varias empresas:** una misma clave puede estar vinculada a más",
         "de una empresa (por ejemplo, distintas cuentas de un mismo cliente). En ese",
-        "caso se devuelven los documentos de todas ellas, cada uno con su `companyId`",
-        "y `companyName`. Para consultar una sola, enviar el parámetro `companyId`.",
+        "caso se devuelven los documentos de todas ellas, cada uno con su `companyName`.",
         "",
         "**Scope por rol del usuario consultado:**",
         "- `admin` / `admin-editor`: ve todos los documentos de la empresa.",
@@ -66,7 +65,6 @@ const options: swaggerJsdoc.Options = {
           type: "object",
           required: [
             "id",
-            "companyId",
             "companyName",
             "fileName",
             "documentKind",
@@ -81,11 +79,6 @@ const options: swaggerJsdoc.Options = {
               type: "string",
               description: "Identificador único de la firma en Andes Docs.",
               example: "1735689600000",
-            },
-            companyId: {
-              type: "string",
-              description: "ID de la empresa de Andes Docs a la que pertenece el documento.",
-              example: "1001",
             },
             companyName: {
               type: "string",
@@ -148,14 +141,8 @@ const options: swaggerJsdoc.Options = {
         },
         User: {
           type: "object",
-          required: ["userId", "email", "role", "companyId"],
+          required: ["userId", "email", "role"],
           properties: {
-            companyId: {
-              type: "string",
-              description:
-                "Empresa en la que se encontró al usuario. Si el email existe en varias empresas de la clave, se informa la primera y se devuelven los documentos de todas.",
-              example: "1001",
-            },
             userId: {
               type: "string",
               description: "ID interno del usuario en Andes Docs.",
@@ -363,15 +350,6 @@ const options: swaggerJsdoc.Options = {
             },
             {
               in: "query",
-              name: "companyId",
-              required: false,
-              schema: { type: "string" },
-              description:
-                "Limita la consulta a una de las empresas vinculadas a la API key. Si se omite, se consultan todas. Devuelve `400 COMPANY_NOT_ALLOWED` si la empresa no está vinculada a la clave.",
-              example: "1001",
-            },
-            {
-              in: "query",
               name: "status",
               required: false,
               schema: {
@@ -410,12 +388,10 @@ const options: swaggerJsdoc.Options = {
                       userId: "auth0|abc123def456",
                       email: "usuario@empresa.com",
                       role: "user",
-                      companyId: "1001",
                     },
                     data: [
                       {
                         id: "1735689600000",
-                        companyId: "1001",
                         companyName: "Empresa S.A.",
                         fileName: "Reserva Depto Palermo.pdf",
                         documentKind: "Reserva",
@@ -428,7 +404,6 @@ const options: swaggerJsdoc.Options = {
                       },
                       {
                         id: "1735776000000",
-                        companyId: "1001",
                         companyName: "Empresa S.A.",
                         fileName: "Autorización Depto Recoleta.pdf",
                         documentKind: "Autorización",
